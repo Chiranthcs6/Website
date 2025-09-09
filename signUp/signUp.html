@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - SJC Grove</title>
-    <!-- Use CDN for Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- ✅ SOLUTION 2: Add base href to resolve paths from root -->
+    <base href="/">
+    
+    <!-- ✅ Only local CSS - no external requests -->
+    <link href="dist/style.css" rel="stylesheet">
     <!-- Argon2 library for password hashing -->
     <script src="https://cdn.jsdelivr.net/npm/argon2-browser@1.18.0/dist/argon2-browser.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -106,9 +110,9 @@
                     <div class="text-center space-y-4">
                         <p class="text-gray-600">
                             Already have an account? 
-                            <a href="../loginPage/loginPage.html" class="text-green-600 font-medium hover:text-green-800">Sign in</a>
+                            <a href="loginPage/loginPage.html" class="text-green-600 font-medium hover:text-green-800">Sign in</a>
                         </p>
-                        <a href="../index.html" class="block text-sm text-gray-500 hover:text-gray-700">← Back to Home</a>
+                        <a href="index.html" class="block text-sm text-gray-500 hover:text-gray-700">← Back to Home</a>
                     </div>
                 </form>
 
@@ -124,6 +128,6 @@
         </div>
     </div>
 
-    <script src="signup.js"></script>
+    <script src="signUp/signup.js"></script>
 </body>
 </html>
