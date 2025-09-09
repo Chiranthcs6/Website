@@ -4,18 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SJC Grove - Main Page</title>
-    <!-- Fixed CSS path - remove leading slash for relative path -->
+    <!-- Base href to resolve paths from root -->
+    <base href="/">
+    
+    <!-- Local CSS -->
     <link href="dist/style.css" rel="stylesheet">
 
     <style>
-        /* Ensure Tailwind utilities are available */
-        @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
-        
-        /* Additional custom styles */
+        /* Custom styles for animations and dropdowns */
         body {
             font-family: 'Inter', sans-serif;
         }
-        
+        /* Selected option styling */
+        .selected {
+        background-color: #dbeafe !important;
+        color: #1e40af !important;
+        font-weight: 600 !important;
+}
+
         .dropdown-enter {
             opacity: 0;
             transform: translateY(-10px);
@@ -35,12 +41,10 @@
             transition: all 200ms ease-in;
         }
         
-        /* Additional styles to ensure proper rendering */
         .rotate-180 {
             transform: rotate(180deg);
         }
         
-        /* Ensure dropdowns have proper z-index */
         .dropdown-menu {
             z-index: 50;
         }
