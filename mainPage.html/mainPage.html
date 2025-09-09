@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SJC Grove - Main Page</title>
+    <!-- Fixed CSS path - remove leading slash for relative path -->
+    <link href="dist/style.css" rel="stylesheet">
+    <!-- Fallback: Include Tailwind from CDN if local file fails -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Ensure Tailwind utilities are available */
+        @import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+        
+        /* Additional custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .dropdown-enter {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .dropdown-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 200ms ease-out;
+        }
+        .dropdown-exit {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .dropdown-exit-active {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 200ms ease-in;
+        }
+        
+        /* Additional styles to ensure proper rendering */
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+        
+        /* Ensure dropdowns have proper z-index */
+        .dropdown-menu {
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen">
+    <!-- Top Navigation Bar -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">SJC</span>
+                    </div>
+                    <div class="text-xl font-bold text-blue-600">SJC Grove</div>
+                </div>
+
+                <!-- Navigation Dropdowns -->
+                <div class="hidden md:flex space-x-8">
+                    <!-- Scheme Dropdown -->
+                    <div class="relative">
+                        <button id="scheme-btn" class="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition duration-200">
+                            <span>Scheme</span>
+                            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="scheme-dropdown" class="absolute hidden top-full left-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-menu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="2018">Scheme 2018</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="2020">Scheme 2020</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="2022">Scheme 2022</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="2024">Scheme 2024</a>
+                        </div>
+                    </div>
+
+                    <!-- Branch Dropdown -->
+                    <div class="relative">
+                        <button id="branch-btn" class="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition duration-200">
+                            <span>Branch</span>
+                            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="branch-dropdown" class="absolute hidden top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-menu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="cse">Computer Science Engineering</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="ece">Electronics & Communication</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="mech">Mechanical Engineering</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="civil">Civil Engineering</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="eee">Electrical Engineering</a>
+                        </div>
+                    </div>
+
+                    <!-- Semester Dropdown -->
+                    <div class="relative">
+                        <button id="semester-btn" class="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition duration-200">
+                            <span>Semester</span>
+                            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="semester-dropdown" class="absolute hidden top-full left-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-menu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="1">Semester 1</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="2">Semester 2</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="3">Semester 3</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="4">Semester 4</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="5">Semester 5</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="6">Semester 6</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="7">Semester 7</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="8">Semester 8</a>
+                        </div>
+                    </div>
+
+                    <!-- Subject Dropdown -->
+                    <div class="relative">
+                        <button id="subject-btn" class="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-lg hover:bg-gray-100 transition duration-200">
+                            <span>Subject</span>
+                            <svg class="w-4 h-4 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="subject-dropdown" class="absolute hidden top-full left-0 mt-1 w-72 bg-white rounded-lg shadow-lg border border-gray-200 py-2 dropdown-menu">
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="math1">Mathematics - I</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="physics">Physics for Engineers</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="cprog">Programming in C</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="ds">Data Structures</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="dbms">Database Management Systems</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="networks">Computer Networks</a>
+                            <a href="#" class="block px-4 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition duration-150" data-value="se">Software Engineering</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-btn" class="text-gray-700 hover:text-blue-600 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- User Profile & Logout -->
+                <div class="flex items-center space-x-3">
+                    <span id="user-name" class="text-gray-600 text-sm hidden sm:inline">Welcome, Student</span>
+                    <button id="logout-btn" class="text-red-500 hover:text-red-700 text-sm font-medium transition duration-200">Logout</button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden border-t border-gray-200 py-4">
+                <div class="space-y-2">
+                    <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Scheme</button>
+                    <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Branch</button>
+                    <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Semester</button>
+                    <button class="block w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg">Subject</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Welcome Section -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4">Welcome to SJC Grove Portal</h1>
+            <p class="text-gray-600 mb-6">Select your scheme, branch, semester, and subject from the navigation above to access academic resources.</p>
+            
+            <!-- Current Selection Display -->
+            <div id="current-selection" class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 hidden">
+                <h3 class="text-lg font-semibold text-blue-800 mb-2">Current Selection:</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                        <span class="text-gray-600">Scheme:</span>
+                        <span id="selected-scheme" class="font-medium text-blue-800 ml-1">-</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Branch:</span>
+                        <span id="selected-branch" class="font-medium text-blue-800 ml-1">-</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Semester:</span>
+                        <span id="selected-semester" class="font-medium text-blue-800 ml-1">-</span>
+                    </div>
+                    <div>
+                        <span class="text-gray-600">Subject:</span>
+                        <span id="selected-subject" class="font-medium text-blue-800 ml-1">-</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Quick Stats -->
+            <div class="grid md:grid-cols-4 gap-6 mt-8">
+                <div class="bg-blue-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-blue-600">4</div>
+                    <div class="text-sm text-gray-600">Available Schemes</div>
+                </div>
+                <div class="bg-green-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-green-600">5</div>
+                    <div class="text-sm text-gray-600">Engineering Branches</div>
+                </div>
+                <div class="bg-purple-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-600">8</div>
+                    <div class="text-sm text-gray-600">Semesters</div>
+                </div>
+                <div class="bg-orange-50 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-orange-600">150+</div>
+                    <div class="text-sm text-gray-600">Subjects Available</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area" class="bg-white rounded-xl shadow-lg p-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Select your preferences</h2>
+            <p class="text-gray-600 mb-6">Use the dropdown menus above to select your scheme, branch, semester, and subject to view relevant academic content.</p>
+            
+            <!-- Placeholder for dynamic content -->
+            <div id="dynamic-content" class="space-y-4">
+                <div class="bg-gray-50 rounded-lg p-6 text-center">
+                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="text-lg font-medium text-gray-800 mb-2">No Content Selected</h3>
+                    <p class="text-gray-600">Please select your academic preferences from the navigation above to view relevant materials.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 text-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading content...</p>
+        </div>
+    </div>
+
+    <script src="mainPage.js"></script>
+</body>
+</html>
