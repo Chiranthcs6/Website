@@ -21,15 +21,15 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.textContent = 'Verifying...';
 
         try {
-            // Send credentials directly (no client-side hashing)
-            const apiResponse = await fetch('/api/login', {
-                method: 'PUT',
+            // Updated API call to match backend specification
+            const apiResponse = await fetch('/api/user/login', {
+                method: 'PUT',  // Changed to PUT as per API spec
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,
-                    password: password  // Plain text password
+                    email: email_string,
+                    passwordHash: pwd_string  // Changed to passwordhash as per API spec
                 })
             });
 
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const responseData = await apiResponse.json();
             
             if (responseData.valid) {
-                localStorage.setItem('session_token', responseData.session_token);
+                localStorage.setItem('token', responseData.token);  // Changed to 'token' from API response
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
                 

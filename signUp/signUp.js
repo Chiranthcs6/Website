@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📝 SJC Grove Signup page loaded');
-
+    
     const signupForm = document.getElementById('signup-form');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     signupForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-
+        
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
@@ -26,15 +26,16 @@ document.addEventListener('DOMContentLoaded', function() {
         signupBtn.textContent = 'Creating Account...';
 
         try {
-            // Send credentials directly (no hashing)
-            const apiResponse = await fetch('/api/signup', {
+            // Updated API call to match backend specification
+            const apiResponse = await fetch('/api/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,
-                    password: password  // Changed from pwdhash to password
+                    email: email_string,
+                    name: username, // Extract username from email
+                    passwordHash: pwd_hash
                 })
             });
 
@@ -45,10 +46,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const responseData = await apiResponse.json();
             
             if (responseData.valid) {
-                localStorage.setItem('session_token', responseData.session_token);
+                localStorage.setItem('session_token', responseData.token);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
-
+                
                 alert('Account created successfully! Welcome to SJC Grove.');
                 window.location.href = '../mainPage.html';
             } else {
