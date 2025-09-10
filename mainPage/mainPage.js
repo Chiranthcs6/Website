@@ -1,125 +1,125 @@
-// CS Engineering focused dummy data
+// CS Engineering focused dummy data with IDs matching titlePage
 const dummyData = [
-  {
-    id: 1,
-    title: "Mathematics I - Complete Notes",
-    scheme: "2024",
-    branch: "Computer Science",
-    subject: "Mathematics",
-    year: "1st Year",
-    desc: "Comprehensive calculus and linear algebra notes for first year engineering students.",
-    icon: "📐"
-  },
-  {
-    id: 2,
-    title: "Physics for Engineers Handbook",
-    scheme: "2022",
-    branch: "Electronics",
-    subject: "Physics",
-    year: "1st Year",
-    desc: "Applied physics concepts with engineering applications and laboratory experiments.",
-    icon: "⚗️"
-  },
-  {
-    id: 3,
-    title: "Programming in C - Lab Manual",
-    scheme: "2024",
-    branch: "Computer Science",
-    subject: "Programming",
-    year: "1st Year",
-    desc: "Complete C programming tutorial with practical exercises and projects.",
-    icon: "💻"
-  },
-  {
-    id: 4,
-    title: "Data Structures and Algorithms",
-    scheme: "2022",
-    branch: "Computer Science",
-    subject: "Data Structures",
-    year: "2nd Year",
-    desc: "Comprehensive guide to data structures implementation and algorithm analysis.",
-    icon: "🔗"
-  },
-  {
-    id: 5,
-    title: "Database Management Systems",
-    scheme: "2020",
-    branch: "Computer Science",
-    subject: "DBMS",
-    year: "3rd Year",
-    desc: "Complete DBMS concepts covering SQL, normalization, and database design.",
-    icon: "🗄️"
-  },
-  {
-    id: 6,
-    title: "Computer Networks Fundamentals",
-    scheme: "2024",
-    branch: "Computer Science",
-    subject: "Networks",
-    year: "3rd Year",
-    desc: "Network protocols, OSI model, TCP/IP, and network security essentials.",
-    icon: "🌐"
-  },
-  {
-    id: 7,
-    title: "Software Engineering Principles",
-    scheme: "2022",
-    branch: "Computer Science",
-    subject: "Software Engineering",
-    year: "4th Year",
-    desc: "Software development lifecycle, testing, and project management methodologies.",
-    icon: "🔧"
-  },
-  {
-    id: 8,
-    title: "Operating Systems Concepts",
-    scheme: "2020",
-    branch: "Computer Science",
-    subject: "Operating Systems",
-    year: "3rd Year",
-    desc: "Process management, memory allocation, file systems, and system calls.",
-    icon: "⚙️"
-  },
-  {
-    id: 9,
-    title: "Digital Electronics Lab",
-    scheme: "2024",
-    branch: "Electronics",
-    subject: "Digital Electronics",
-    year: "2nd Year",
-    desc: "Logic gates, flip-flops, counters, and digital circuit design experiments.",
-    icon: "🔌"
-  },
-  {
-    id: 10,
-    title: "Engineering Mechanics",
-    scheme: "2022",
-    branch: "Mechanical",
-    subject: "Mechanics",
-    year: "2nd Year",
-    desc: "Statics, dynamics, and strength of materials for mechanical engineers.",
-    icon: "🔩"
-  },
-  {
-    id: 11,
-    title: "Structural Analysis",
-    scheme: "2020",
-    branch: "Civil",
-    subject: "Structures",
-    year: "3rd Year",
-    desc: "Analysis of beams, trusses, and frames using classical methods.",
-    icon: "🏗️"
-  },
-  {
-    id: 12,
-    title: "Electrical Circuits",
-    scheme: "2024",
-    branch: "Electrical",
-    subject: "Circuits",
-    year: "2nd Year",
-    desc: "AC/DC circuit analysis, network theorems, and electrical measurements.",
-    icon: "⚡"
-  }
+    {
+        id: 1,
+        title: "Mathematics I - Complete Notes",
+        scheme: "2024",
+        branch: "Computer Science",
+        subject: "Mathematics",
+        year: "1st Year",
+        desc: "Comprehensive calculus and linear algebra notes for first year engineering students.",
+        icon: "📐"
+    },
+    {
+        id: 2,
+        title: "Physics for Engineers Handbook",
+        scheme: "2022",
+        branch: "Electronics",
+        subject: "Physics",
+        year: "1st Year",
+        desc: "Applied physics concepts with engineering applications and laboratory experiments.",
+        icon: "⚗️"
+    },
+    {
+        id: 3,
+        title: "Programming in C - Lab Manual",
+        scheme: "2024",
+        branch: "Computer Science",
+        subject: "Programming",
+        year: "1st Year",
+        desc: "Complete C programming tutorial with practical exercises and projects.",
+        icon: "💻"
+    },
+    {
+        id: 4,
+        title: "Data Structures and Algorithms",
+        scheme: "2022",
+        branch: "Computer Science",
+        subject: "Data Structures",
+        year: "2nd Year",
+        desc: "Comprehensive guide to data structures implementation and algorithm analysis.",
+        icon: "🔗"
+    },
+    {
+        id: 5,
+        title: "Database Management Systems",
+        scheme: "2020",
+        branch: "Computer Science",
+        subject: "DBMS",
+        year: "3rd Year",
+        desc: "Complete DBMS concepts covering SQL, normalization, and database design.",
+        icon: "🗄️"
+    },
+    {
+        id: 6,
+        title: "Computer Networks Fundamentals",
+        scheme: "2024",
+        branch: "Computer Science",
+        subject: "Networks",
+        year: "3rd Year",
+        desc: "Network protocols, OSI model, TCP/IP, and network security essentials.",
+        icon: "🌐"
+    },
+    {
+        id: 7,
+        title: "Software Engineering Principles",
+        scheme: "2022",
+        branch: "Computer Science",
+        subject: "Software Engineering",
+        year: "4th Year",
+        desc: "Software development lifecycle, testing, and project management methodologies.",
+        icon: "🔧"
+    },
+    {
+        id: 8,
+        title: "Operating Systems Concepts",
+        scheme: "2020",
+        branch: "Computer Science",
+        subject: "Operating Systems",
+        year: "3rd Year",
+        desc: "Process management, memory allocation, file systems, and system calls.",
+        icon: "⚙️"
+    },
+    {
+        id: 9,
+        title: "Digital Electronics Lab",
+        scheme: "2024",
+        branch: "Electronics",
+        subject: "Digital Electronics",
+        year: "2nd Year",
+        desc: "Logic gates, flip-flops, counters, and digital circuit design experiments.",
+        icon: "🔌"
+    },
+    {
+        id: 10,
+        title: "Engineering Mechanics",
+        scheme: "2022",
+        branch: "Mechanical",
+        subject: "Mechanics",
+        year: "2nd Year",
+        desc: "Statics, dynamics, and strength of materials for mechanical engineers.",
+        icon: "🔩"
+    },
+    {
+        id: 11,
+        title: "Structural Analysis",
+        scheme: "2020",
+        branch: "Civil",
+        subject: "Structures",
+        year: "3rd Year",
+        desc: "Analysis of beams, trusses, and frames using classical methods.",
+        icon: "🏗️"
+    },
+    {
+        id: 12,
+        title: "Electrical Circuits",
+        scheme: "2024",
+        branch: "Electrical",
+        subject: "Circuits",
+        year: "2nd Year",
+        desc: "AC/DC circuit analysis, network theorems, and electrical measurements.",
+        icon: "⚡"
+    }
 ];
 
 // DOM elements
@@ -173,7 +173,7 @@ function renderCards() {
   // Create cards with enhanced styling
   filtered.forEach((item, index) => {
     const card = document.createElement("div");
-    card.className = "card bg-white shadow-md rounded-lg p-6 hover:shadow-lg border border-gray-200";
+    card.className = "card bg-white shadow-md rounded-lg p-6 hover:shadow-lg border border-gray-200 cursor-pointer";
     
     // Year badge colors
     const yearColors = {
@@ -198,7 +198,7 @@ function renderCards() {
         <span class="px-2 py-1 bg-green-100 text-green-700 rounded">${item.subject}</span>
       </div>
       
-      <button class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center">
+      <button class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center w-full justify-center">
         View Document 
         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
@@ -206,9 +206,10 @@ function renderCards() {
       </button>
     `;
     
-    // Add click handler
+    // Add click handler to navigate to titlePage with document ID
     card.addEventListener('click', () => {
-      alert(`Opening: ${item.title}\n\nScheme: ${item.scheme}\nBranch: ${item.branch}\nSubject: ${item.subject}\nYear: ${item.year}\n\n${item.desc}`);
+      console.log(`Opening document: ${item.title} (ID: ${item.id})`);
+      window.location.href = `titlePage.html?id=${item.id}`;
     });
     
     contentDiv.appendChild(card);
@@ -316,4 +317,4 @@ document.addEventListener("keydown", (e) => {
 // Initial render
 renderCards();
 
-console.log("✅ SJC Grove - CS Engineering Navigation Ready!");
+console.log("✅ SJC Grove Main Page - Ready with titlePage.html navigation!");
