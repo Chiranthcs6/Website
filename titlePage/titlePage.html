@@ -1,43 +1,173 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document Details</title>
-  <link rel="stylesheet" href="../dist/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Viewer - SJC Grove</title>
+    <link href="dist/style.css" rel="stylesheet">
+    <style>
+        .pdf-container {
+            min-height: 600px;
+        }
+        .like-btn, .dislike-btn {
+            transition: all 0.2s ease;
+        }
+        .like-btn.active {
+            background-color: #22c55e;
+            color: white;
+        }
+        .dislike-btn.active {
+            background-color: #ef4444;
+            color: white;
+        }
+        .loading-skeleton {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-  
-  <!-- Title -->
-  <header class="bg-white shadow p-4">
-    <h1 id="doc-title" class="text-2xl font-bold text-gray-800"></h1>
-  </header>
+    
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        SJC
+                    </div>
+                    <span class="font-bold text-xl text-gray-800">SJC Grove</span>
+                </div>
+                
+                <!-- Back Button -->
+                <button onclick="goBack()" class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Back to Documents</span>
+                </button>
+                
+                <!-- User Info -->
+                <div class="flex items-center space-x-4">
+                    <span class="hidden sm:block text-gray-600 font-medium">Hello, Student</span>
+                    <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-  <!-- Info bar -->
-  <div class="flex justify-between items-center bg-white shadow p-4">
-    <div>
-      <p><strong>Scheme:</strong> <span id="doc-scheme"></span></p>
-      <p><strong>Branch:</strong> <span id="doc-branch"></span></p>
-      <p><strong>Semester:</strong> <span id="doc-sem"></span></p>
-      <p><strong>Year:</strong> <span id="doc-year"></span></p>
-    </div>
-    <div class="flex items-center gap-4">
-      <p><strong>Publisher:</strong> <span id="doc-publisher"></span></p>
-      <button id="likeBtn" class="px-3 py-1 bg-green-500 text-white rounded">👍</button>
-      <button id="dislikeBtn" class="px-3 py-1 bg-red-500 text-white rounded">👎</button>
-    </div>
-  </div>
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Loading State -->
+        <div id="loading-state" class="text-center py-12">
+            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading document...</p>
+        </div>
 
-  <!-- PDF viewer -->
-  <main class="p-6">
-    <a id="doc-download" href="#" download class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded">
-      View / Download
-    </a>
-    <div class="border rounded-lg shadow overflow-hidden">
-      <iframe id="doc-file" src="" class="w-full h-[600px]"></iframe>
-    </div>
-  </main>
+        <!-- Error State -->
+        <div id="error-state" class="hidden text-center py-12">
+            <div class="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md mx-auto">
+                <svg class="mx-auto h-12 w-12 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-red-800 mb-2">Document Not Found</h3>
+                <p class="text-red-600 mb-4">The requested document could not be found.</p>
+                <button onclick="goBack()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
+                    Back to Documents
+                </button>
+            </div>
+        </div>
 
-  <script src="document.js"></script>
+        <!-- Document Content -->
+        <div id="document-content" class="hidden">
+            
+            <!-- Document Header -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                    <div class="flex-1">
+                        <h1 id="doc-title" class="text-3xl font-bold text-gray-900 mb-3">Document Title</h1>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                            <div>
+                                <span class="text-gray-500">Scheme:</span>
+                                <span id="doc-scheme" class="font-medium text-gray-800 ml-1">-</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Branch:</span>
+                                <span id="doc-branch" class="font-medium text-gray-800 ml-1">-</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Semester:</span>
+                                <span id="doc-semester" class="font-medium text-gray-800 ml-1">-</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">Year:</span>
+                                <span id="doc-year" class="font-medium text-gray-800 ml-1">-</span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <span class="text-gray-500 text-sm">Publisher:</span>
+                            <span id="doc-publisher" class="font-medium text-gray-700 ml-1">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Like/Dislike Buttons -->
+                        <div class="flex items-center space-x-2">
+                            <button id="like-btn" class="like-btn flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-green-100 text-gray-700 rounded-lg border transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V8a2 2 0 00-2-2h-3.17a2 2 0 01-1.97-2.36L8.78 1.292a1 1 0 011.903.44L10 5V8m4 2v10"></path>
+                                </svg>
+                                <span>Like</span>
+                                <span id="like-count" class="text-xs bg-white px-2 py-1 rounded-full">0</span>
+                            </button>
+                            
+                            <button id="dislike-btn" class="dislike-btn flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-red-100 text-gray-700 rounded-lg border transition-all">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h3.17a2 2 0 001.97 2.36l.748 2.708a1 1 0 01-1.903.44L14 19v-3m-4-2v-10"></path>
+                                </svg>
+                                <span>Dislike</span>
+                                <span id="dislike-count" class="text-xs bg-white px-2 py-1 rounded-full">0</span>
+                            </button>
+                        </div>
+                        
+                        <!-- Download Button -->
+                        <button id="download-btn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                            </svg>
+                            <span>Download PDF</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PDF Viewer -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Document Preview</h2>
+                <div class="pdf-container bg-gray-100 rounded-lg overflow-hidden">
+                    <iframe 
+                        id="pdf-viewer" 
+                        class="w-full h-full border-0 rounded-lg" 
+                        style="min-height: 600px;"
+                        title="PDF Document Viewer">
+                    </iframe>
+                </div>
+                <p class="text-sm text-gray-500 mt-2">
+                    If the PDF doesn't load properly, you can 
+                    <a id="fallback-link" href="#" target="_blank" class="text-blue-600 hover:text-blue-800 underline">click here to open it in a new tab</a>.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script src="titlePage.js"></script>
 </body>
 </html>

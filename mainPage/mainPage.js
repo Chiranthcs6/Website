@@ -1,84 +1,124 @@
-// Enhanced dummy data
+// CS Engineering focused dummy data
 const dummyData = [
   {
     id: 1,
-    title: "Terra: Land Changes Analysis",
-    category: "Terra",
-    difficulty: "Beginner",
-    subject: "Earth Science",
-    year: "2025",
-    desc: "Comprehensive analysis of global land use changes using Terra satellite imagery.",
-    icon: "🛰️"
+    title: "Mathematics I - Complete Notes",
+    scheme: "2024",
+    branch: "Computer Science",
+    subject: "Mathematics",
+    year: "1st Year",
+    desc: "Comprehensive calculus and linear algebra notes for first year engineering students.",
+    icon: "📐"
   },
   {
     id: 2,
-    title: "Hunt for Exoplanets with AI",
-    category: "Exoplanet",
-    difficulty: "Advanced",
-    subject: "AI",
-    year: "2024",
-    desc: "Advanced machine learning algorithms for detecting exoplanets.",
-    icon: "🔍"
+    title: "Physics for Engineers Handbook",
+    scheme: "2022",
+    branch: "Electronics",
+    subject: "Physics",
+    year: "1st Year",
+    desc: "Applied physics concepts with engineering applications and laboratory experiments.",
+    icon: "⚗️"
   },
   {
     id: 3,
-    title: "Climate Trends Analysis 2023",
-    category: "Climate",
-    difficulty: "Intermediate",
-    subject: "Data Analysis",
-    year: "2023",
-    desc: "Statistical analysis of global climate patterns and temperature anomalies.",
-    icon: "📈"
+    title: "Programming in C - Lab Manual",
+    scheme: "2024",
+    branch: "Computer Science",
+    subject: "Programming",
+    year: "1st Year",
+    desc: "Complete C programming tutorial with practical exercises and projects.",
+    icon: "💻"
   },
   {
     id: 4,
-    title: "Terra Animation Storytelling",
-    category: "Terra",
-    difficulty: "Intermediate",
-    subject: "Storytelling",
-    year: "2025",
-    desc: "Creating compelling animated narratives about Earth's changing landscapes.",
-    icon: "🎬"
+    title: "Data Structures and Algorithms",
+    scheme: "2022",
+    branch: "Computer Science",
+    subject: "Data Structures",
+    year: "2nd Year",
+    desc: "Comprehensive guide to data structures implementation and algorithm analysis.",
+    icon: "🔗"
   },
   {
     id: 5,
-    title: "AI-Powered Weather Prediction",
-    category: "Climate",
-    difficulty: "Advanced",
-    subject: "AI",
-    year: "2022",
-    desc: "Deep learning models for predicting extreme weather events.",
-    icon: "⚡"
+    title: "Database Management Systems",
+    scheme: "2020",
+    branch: "Computer Science",
+    subject: "DBMS",
+    year: "3rd Year",
+    desc: "Complete DBMS concepts covering SQL, normalization, and database design.",
+    icon: "🗄️"
   },
   {
     id: 6,
-    title: "Exoplanet Data Visualizations",
-    category: "Exoplanet",
-    difficulty: "Beginner",
-    subject: "Data Analysis",
-    year: "2024",
-    desc: "Interactive visualization techniques for exploring exoplanet characteristics.",
-    icon: "📊"
+    title: "Computer Networks Fundamentals",
+    scheme: "2024",
+    branch: "Computer Science",
+    subject: "Networks",
+    year: "3rd Year",
+    desc: "Network protocols, OSI model, TCP/IP, and network security essentials.",
+    icon: "🌐"
   },
   {
     id: 7,
-    title: "Satellite Imagery 101",
-    category: "Terra",
-    difficulty: "Beginner",
-    subject: "Earth Science",
-    year: "2023",
-    desc: "Introduction to satellite imagery interpretation and spectral analysis.",
-    icon: "🌍"
+    title: "Software Engineering Principles",
+    scheme: "2022",
+    branch: "Computer Science",
+    subject: "Software Engineering",
+    year: "4th Year",
+    desc: "Software development lifecycle, testing, and project management methodologies.",
+    icon: "🔧"
   },
   {
     id: 8,
-    title: "Climate Story Maps",
-    category: "Climate",
-    difficulty: "Intermediate",
-    subject: "Storytelling",
-    year: "2024",
-    desc: "Interactive story maps combining geographic data with climate narratives.",
-    icon: "🗺️"
+    title: "Operating Systems Concepts",
+    scheme: "2020",
+    branch: "Computer Science",
+    subject: "Operating Systems",
+    year: "3rd Year",
+    desc: "Process management, memory allocation, file systems, and system calls.",
+    icon: "⚙️"
+  },
+  {
+    id: 9,
+    title: "Digital Electronics Lab",
+    scheme: "2024",
+    branch: "Electronics",
+    subject: "Digital Electronics",
+    year: "2nd Year",
+    desc: "Logic gates, flip-flops, counters, and digital circuit design experiments.",
+    icon: "🔌"
+  },
+  {
+    id: 10,
+    title: "Engineering Mechanics",
+    scheme: "2022",
+    branch: "Mechanical",
+    subject: "Mechanics",
+    year: "2nd Year",
+    desc: "Statics, dynamics, and strength of materials for mechanical engineers.",
+    icon: "🔩"
+  },
+  {
+    id: 11,
+    title: "Structural Analysis",
+    scheme: "2020",
+    branch: "Civil",
+    subject: "Structures",
+    year: "3rd Year",
+    desc: "Analysis of beams, trusses, and frames using classical methods.",
+    icon: "🏗️"
+  },
+  {
+    id: 12,
+    title: "Electrical Circuits",
+    scheme: "2024",
+    branch: "Electrical",
+    subject: "Circuits",
+    year: "2nd Year",
+    desc: "AC/DC circuit analysis, network theorems, and electrical measurements.",
+    icon: "⚡"
   }
 ];
 
@@ -89,10 +129,10 @@ const resultsTitle = document.getElementById("results-title");
 const noResults = document.getElementById("no-results");
 const filterCount = document.getElementById("filter-count");
 
-// Current filter state
+// Updated filter state for CS Engineering
 const filters = {
-  category: "All",
-  difficulty: "All",
+  scheme: "All",
+  branch: "All",
   subject: "All",
   year: "All",
 };
@@ -103,8 +143,8 @@ function renderCards() {
   
   // Filter the data
   const filtered = dummyData.filter(item => {
-    return (filters.category === "All" || item.category === filters.category) &&
-           (filters.difficulty === "All" || item.difficulty === filters.difficulty) &&
+    return (filters.scheme === "All" || item.scheme === filters.scheme) &&
+           (filters.branch === "All" || item.branch === filters.branch) &&
            (filters.subject === "All" || item.subject === filters.subject) &&
            (filters.year === "All" || item.year === filters.year);
   });
@@ -135,26 +175,27 @@ function renderCards() {
     const card = document.createElement("div");
     card.className = "card bg-white shadow-md rounded-lg p-6 hover:shadow-lg border border-gray-200";
     
-    // Difficulty badge colors
-    const difficultyColors = {
-      "Beginner": "bg-green-100 text-green-800",
-      "Intermediate": "bg-yellow-100 text-yellow-800",
-      "Advanced": "bg-red-100 text-red-800"
+    // Year badge colors
+    const yearColors = {
+      "1st Year": "bg-green-100 text-green-800",
+      "2nd Year": "bg-blue-100 text-blue-800",
+      "3rd Year": "bg-yellow-100 text-yellow-800",
+      "4th Year": "bg-red-100 text-red-800"
     };
 
     card.innerHTML = `
       <div class="flex items-start justify-between mb-4">
         <div class="text-3xl">${item.icon}</div>
-        <span class="px-2 py-1 rounded-full text-xs font-medium ${difficultyColors[item.difficulty]}">${item.difficulty}</span>
+        <span class="px-2 py-1 rounded-full text-xs font-medium ${yearColors[item.year]}">${item.year}</span>
       </div>
       
       <h3 class="text-lg font-semibold text-gray-900 mb-2">${item.title}</h3>
       <p class="text-gray-600 text-sm mb-4">${item.desc}</p>
       
       <div class="flex flex-wrap gap-2 mb-4 text-xs">
-        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">${item.category}</span>
-        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">${item.subject}</span>
-        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">${item.year}</span>
+        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">Scheme ${item.scheme}</span>
+        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">${item.branch}</span>
+        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">${item.subject}</span>
       </div>
       
       <button class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center">
@@ -167,7 +208,7 @@ function renderCards() {
     
     // Add click handler
     card.addEventListener('click', () => {
-      alert(`Opening: ${item.title}\n\n${item.desc}`);
+      alert(`Opening: ${item.title}\n\nScheme: ${item.scheme}\nBranch: ${item.branch}\nSubject: ${item.subject}\nYear: ${item.year}\n\n${item.desc}`);
     });
     
     contentDiv.appendChild(card);
@@ -275,4 +316,4 @@ document.addEventListener("keydown", (e) => {
 // Initial render
 renderCards();
 
-console.log("✅ SJC Grove - Enhanced Tab Navigation Ready!");
+console.log("✅ SJC Grove - CS Engineering Navigation Ready!");
