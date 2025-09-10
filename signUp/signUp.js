@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
+        // Basic validation
         if (!email || !password) {
             alert('Please fill out all fields.');
             return;
@@ -22,20 +23,23 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Extract username from email (part before @)
+        const username = email.split('@')[0];
+
         signupBtn.disabled = true;
         signupBtn.textContent = 'Creating Account...';
 
         try {
-            // Updated API call to match backend specification
+            // 📤 REQUEST: Send signup data to backend
             const apiResponse = await fetch('/api/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email_string,
-                    name: username, // Extract username from email
-                    passwordHash: pwd_hash
+                    email: email,
+                    name: username,
+                    passwordHash: password  // ✅ Plain password (no hashing)
                 })
             });
 
@@ -43,15 +47,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`HTTP ${apiResponse.status}: ${apiResponse.statusText}`);
             }
 
+            // 📥 RECEIVE: Get response from backend
             const responseData = await apiResponse.json();
             
+            // Check response structure: {valid: boolean, token: string}
             if (responseData.valid) {
+                // Store authentication data
                 localStorage.setItem('session_token', responseData.token);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
                 
                 alert('Account created successfully! Welcome to SJC Grove.');
-                window.location.href = '../mainPage.html';
+                
+                // Redirect to main page
+                window.location.href = '../mainPage/mainPage.html';
             } else {
                 alert('Signup failed: ' + (responseData.error || 'Account creation failed'));
             }
@@ -60,12 +69,13 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('API Signup error:', error);
             alert('Signup failed. Please check your connection and try again.');
         } finally {
+            // Re-enable the button
             signupBtn.disabled = false;
             signupBtn.textContent = 'Create Account';
         }
     });
 
-    // Enter key support
+    // Enter key navigation
     emailInput.addEventListener('keypress', function(event) {
         if (event.key === 'Enter') {
             passwordInput.focus();

@@ -1,266 +1,278 @@
-// Enhanced dropdown system with dynamic content and clear functionality
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✅ SJC Grove Main Page loaded');
+// Enhanced dummy data
+const dummyData = [
+  {
+    id: 1,
+    title: "Terra: Land Changes Analysis",
+    category: "Terra",
+    difficulty: "Beginner",
+    subject: "Earth Science",
+    year: "2025",
+    desc: "Comprehensive analysis of global land use changes using Terra satellite imagery.",
+    icon: "🛰️"
+  },
+  {
+    id: 2,
+    title: "Hunt for Exoplanets with AI",
+    category: "Exoplanet",
+    difficulty: "Advanced",
+    subject: "AI",
+    year: "2024",
+    desc: "Advanced machine learning algorithms for detecting exoplanets.",
+    icon: "🔍"
+  },
+  {
+    id: 3,
+    title: "Climate Trends Analysis 2023",
+    category: "Climate",
+    difficulty: "Intermediate",
+    subject: "Data Analysis",
+    year: "2023",
+    desc: "Statistical analysis of global climate patterns and temperature anomalies.",
+    icon: "📈"
+  },
+  {
+    id: 4,
+    title: "Terra Animation Storytelling",
+    category: "Terra",
+    difficulty: "Intermediate",
+    subject: "Storytelling",
+    year: "2025",
+    desc: "Creating compelling animated narratives about Earth's changing landscapes.",
+    icon: "🎬"
+  },
+  {
+    id: 5,
+    title: "AI-Powered Weather Prediction",
+    category: "Climate",
+    difficulty: "Advanced",
+    subject: "AI",
+    year: "2022",
+    desc: "Deep learning models for predicting extreme weather events.",
+    icon: "⚡"
+  },
+  {
+    id: 6,
+    title: "Exoplanet Data Visualizations",
+    category: "Exoplanet",
+    difficulty: "Beginner",
+    subject: "Data Analysis",
+    year: "2024",
+    desc: "Interactive visualization techniques for exploring exoplanet characteristics.",
+    icon: "📊"
+  },
+  {
+    id: 7,
+    title: "Satellite Imagery 101",
+    category: "Terra",
+    difficulty: "Beginner",
+    subject: "Earth Science",
+    year: "2023",
+    desc: "Introduction to satellite imagery interpretation and spectral analysis.",
+    icon: "🌍"
+  },
+  {
+    id: 8,
+    title: "Climate Story Maps",
+    category: "Climate",
+    difficulty: "Intermediate",
+    subject: "Storytelling",
+    year: "2024",
+    desc: "Interactive story maps combining geographic data with climate narratives.",
+    icon: "🗺️"
+  }
+];
+
+// DOM elements
+const contentDiv = document.getElementById("content");
+const clearBtn = document.getElementById("clearFilters");
+const resultsTitle = document.getElementById("results-title");
+const noResults = document.getElementById("no-results");
+const filterCount = document.getElementById("filter-count");
+
+// Current filter state
+const filters = {
+  category: "All",
+  difficulty: "All",
+  subject: "All",
+  year: "All",
+};
+
+// Enhanced render function
+function renderCards() {
+  contentDiv.innerHTML = "";
+  
+  // Filter the data
+  const filtered = dummyData.filter(item => {
+    return (filters.category === "All" || item.category === filters.category) &&
+           (filters.difficulty === "All" || item.difficulty === filters.difficulty) &&
+           (filters.subject === "All" || item.subject === filters.subject) &&
+           (filters.year === "All" || item.year === filters.year);
+  });
+
+  // Update results title
+  resultsTitle.textContent = `${filtered.length === dummyData.length ? 'All Documents' : 'Filtered Documents'} (${filtered.length})`;
+  
+  // Update filter count
+  const activeFilters = Object.values(filters).filter(f => f !== "All").length;
+  if (activeFilters > 0) {
+    filterCount.textContent = `${activeFilters} filter(s) active`;
+  } else {
+    filterCount.textContent = "";
+  }
+
+  // Show/hide no results
+  if (filtered.length === 0) {
+    contentDiv.classList.add("hidden");
+    noResults.classList.remove("hidden");
+    return;
+  } else {
+    contentDiv.classList.remove("hidden");
+    noResults.classList.add("hidden");
+  }
+
+  // Create cards with enhanced styling
+  filtered.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "card bg-white shadow-md rounded-lg p-6 hover:shadow-lg border border-gray-200";
     
-    const dropdowns = [
-        { btn: 'scheme-btn', menu: 'scheme-dropdown', key: 'scheme' },
-        { btn: 'branch-btn', menu: 'branch-dropdown', key: 'branch' },
-        { btn: 'semester-btn', menu: 'semester-dropdown', key: 'semester' },
-        { btn: 'subject-btn', menu: 'subject-dropdown', key: 'subject' }
-    ];
-    
-    let selections = {
-        scheme: null,
-        branch: null,
-        semester: null,
-        subject: null
+    // Difficulty badge colors
+    const difficultyColors = {
+      "Beginner": "bg-green-100 text-green-800",
+      "Intermediate": "bg-yellow-100 text-yellow-800",
+      "Advanced": "bg-red-100 text-red-800"
     };
 
-    // Initialize dropdowns
-    dropdowns.forEach(({ btn, menu, key }) => {
-        const button = document.getElementById(btn);
-        const dropdown = document.getElementById(menu);
-        
-        if (!button || !dropdown) return;
-        
-        // Button click handler
-        button.addEventListener('click', function(e) {
-            e.stopPropagation();
-            
-            // Close all other dropdowns
-            dropdowns.forEach(({ menu: otherMenu }) => {
-                if (otherMenu !== menu) {
-                    document.getElementById(otherMenu).classList.add('hidden');
-                }
-            });
-            
-            // Toggle current dropdown
-            dropdown.classList.toggle('hidden');
-        });
-        
-        // Option click handler
-        dropdown.querySelectorAll('a').forEach(option => {
-            option.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const value = this.getAttribute('data-value');
-                const text = this.textContent;
-                const isSelected = this.classList.contains('selected');
-                
-                if (isSelected) {
-                    // Deselect option
-                    this.classList.remove('selected');
-                    selections[key] = null;
-                    button.querySelector('span').textContent = key.charAt(0).toUpperCase() + key.slice(1);
-                    
-                    // Clear dependent selections
-                    clearDependentSelections(key);
-                } else {
-                    // Select option
-                    dropdown.querySelectorAll('a').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    this.classList.add('selected');
-                    selections[key] = { value, text };
-                    button.querySelector('span').textContent = text;
-                }
-                
-                dropdown.classList.add('hidden');
-                updatePreferences();
-                updateDynamicContent();
-            });
-        });
+    card.innerHTML = `
+      <div class="flex items-start justify-between mb-4">
+        <div class="text-3xl">${item.icon}</div>
+        <span class="px-2 py-1 rounded-full text-xs font-medium ${difficultyColors[item.difficulty]}">${item.difficulty}</span>
+      </div>
+      
+      <h3 class="text-lg font-semibold text-gray-900 mb-2">${item.title}</h3>
+      <p class="text-gray-600 text-sm mb-4">${item.desc}</p>
+      
+      <div class="flex flex-wrap gap-2 mb-4 text-xs">
+        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">${item.category}</span>
+        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">${item.subject}</span>
+        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded">${item.year}</span>
+      </div>
+      
+      <button class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center">
+        View Document 
+        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </button>
+    `;
+    
+    // Add click handler
+    card.addEventListener('click', () => {
+      alert(`Opening: ${item.title}\n\n${item.desc}`);
     });
     
-    // Clear dependent selections when parent changes
-    function clearDependentSelections(changedKey) {
-        const keys = ['scheme', 'branch', 'semester', 'subject'];
-        const index = keys.indexOf(changedKey);
-        
-        for (let i = index + 1; i < keys.length; i++) {
-            const dependentKey = keys[i];
-            selections[dependentKey] = null;
-            
-            // Reset button text
-            const btn = document.getElementById(`${dependentKey}-btn`);
-            if (btn) {
-                btn.querySelector('span').textContent = dependentKey.charAt(0).toUpperCase() + dependentKey.slice(1);
-            }
-            
-            // Clear selected class from options
-            const menu = document.getElementById(`${dependentKey}-dropdown`);
-            if (menu) {
-                menu.querySelectorAll('a').forEach(item => {
-                    item.classList.remove('selected');
-                });
-            }
-        }
+    contentDiv.appendChild(card);
+  });
+
+  // Update filter indicators
+  updateFilterIndicators();
+}
+
+// Update filter indicators on tabs
+function updateFilterIndicators() {
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    const filterType = tab.dataset.filter;
+    const indicator = tab.querySelector('.filter-indicator');
+    
+    if (filters[filterType] !== "All") {
+      indicator.classList.remove('hidden');
+      tab.classList.add('active');
+    } else {
+      indicator.classList.add('hidden');
+      tab.classList.remove('active');
     }
+  });
+}
+
+// Tab click handlers
+document.querySelectorAll(".nav-tab").forEach(tab => {
+  tab.addEventListener("click", (e) => {
+    e.stopPropagation();
     
-    // Update preferences display
-    function updatePreferences() {
-        const selectionDiv = document.getElementById('current-selection');
-        const hasSelections = Object.values(selections).some(sel => sel !== null);
-        
-        if (hasSelections) {
-            selectionDiv.classList.remove('hidden');
-            
-            // Update individual displays
-            Object.keys(selections).forEach(key => {
-                const span = document.getElementById(`selected-${key}`);
-                if (span) {
-                    span.textContent = selections[key] ? selections[key].text : '-';
-                }
-            });
-            
-            // Add clear button if not exists
-            let clearBtn = document.getElementById('clear-all-btn');
-            if (!clearBtn) {
-                clearBtn = document.createElement('button');
-                clearBtn.id = 'clear-all-btn';
-                clearBtn.className = 'mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-200';
-                clearBtn.textContent = 'Clear All Selections';
-                clearBtn.addEventListener('click', clearAllSelections);
-                selectionDiv.appendChild(clearBtn);
-            }
-        } else {
-            selectionDiv.classList.add('hidden');
-        }
+    const dropdown = tab.nextElementSibling;
+    const isOpen = dropdown.classList.contains("show");
+    
+    // Close all dropdowns
+    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
+    
+    // Toggle current dropdown
+    if (!isOpen) {
+      dropdown.classList.add("show");
     }
-    
-    // Clear all selections
-    function clearAllSelections() {
-        selections = { scheme: null, branch: null, semester: null, subject: null };
-        
-        // Reset all buttons
-        dropdowns.forEach(({ btn, key }) => {
-            const button = document.getElementById(btn);
-            if (button) {
-                button.querySelector('span').textContent = key.charAt(0).toUpperCase() + key.slice(1);
-            }
-        });
-        
-        // Remove selected class from all options
-        dropdowns.forEach(({ menu }) => {
-            const dropdown = document.getElementById(menu);
-            if (dropdown) {
-                dropdown.querySelectorAll('a').forEach(item => {
-                    item.classList.remove('selected');
-                });
-            }
-        });
-        
-        updatePreferences();
-        updateDynamicContent();
-        
-        // Remove clear button
-        const clearBtn = document.getElementById('clear-all-btn');
-        if (clearBtn) {
-            clearBtn.remove();
-        }
-        
-        alert('All selections cleared!');
-    }
-    
-    // Update dynamic content area
-    function updateDynamicContent() {
-        const contentArea = document.getElementById('dynamic-content');
-        const hasSelections = Object.values(selections).some(sel => sel !== null);
-        const allSelected = Object.values(selections).every(sel => sel !== null);
-        
-        if (!hasSelections) {
-            // Show default PDF boxes
-            contentArea.innerHTML = `
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    ${createPdfBox('Sample Document 1', 'doc1.html')}
-                    ${createPdfBox('Sample Document 2', 'doc2.html')}
-                    ${createPdfBox('Sample Document 3', 'doc3.html')}
-                    ${createPdfBox('Sample Document 4', 'doc4.html')}
-                    ${createPdfBox('Sample Document 5', 'doc5.html')}
-                    ${createPdfBox('Sample Document 6', 'doc6.html')}
-                </div>
-            `;
-            
-            // Add click handlers to PDF boxes
-            contentArea.querySelectorAll('.pdf-box').forEach(box => {
-                box.addEventListener('click', function() {
-                    const url = this.getAttribute('data-url');
-                    window.open(url, '_blank');
-                });
-            });
-            
-        } else if (allSelected) {
-            // Show final selection
-            contentArea.innerHTML = `
-                <div class="bg-green-50 border border-green-200 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-green-800 mb-4">📚 Your Selected Resource</h3>
-                    <div class="space-y-2 text-sm text-green-700">
-                        <p><strong>Scheme:</strong> ${selections.scheme.text}</p>
-                        <p><strong>Branch:</strong> ${selections.branch.text}</p>
-                        <p><strong>Semester:</strong> ${selections.semester.text}</p>
-                        <p><strong>Subject:</strong> ${selections.subject.text}</p>
-                    </div>
-                    <div class="mt-4 grid md:grid-cols-2 gap-4">
-                        ${createPdfBox('Lecture Notes', 'notes.html')}
-                        ${createPdfBox('Previous Papers', 'papers.html')}
-                        ${createPdfBox('Lab Manuals', 'labs.html')}
-                        ${createPdfBox('Reference Books', 'books.html')}
-                    </div>
-                </div>
-            `;
-            
-            // Add click handlers to PDF boxes
-            contentArea.querySelectorAll('.pdf-box').forEach(box => {
-                box.addEventListener('click', function() {
-                    const url = this.getAttribute('data-url');
-                    window.open(url, '_blank');
-                });
-            });
-            
-        } else {
-            // Show progress indicator
-            const selectedCount = Object.values(selections).filter(sel => sel !== null).length;
-            contentArea.innerHTML = `
-                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
-                    <h3 class="text-lg font-semibold text-yellow-800 mb-2">⚡ Continue Selection</h3>
-                    <p class="text-yellow-700 mb-4">Please complete your selection (${selectedCount}/4 selected)</p>
-                    <div class="flex space-x-2">
-                        ${['scheme', 'branch', 'semester', 'subject'].map(key => 
-                            `<div class="w-6 h-6 rounded-full ${selections[key] ? 'bg-green-500' : 'bg-gray-300'}"></div>`
-                        ).join('')}
-                    </div>
-                </div>
-            `;
-        }
-    }
-    
-    // Create PDF box HTML
-    function createPdfBox(title, url) {
-        return `
-            <div class="pdf-box bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition duration-200 cursor-pointer" data-url="${url}">
-                <div class="flex items-center">
-                    <svg class="w-8 h-8 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 18h12V6l-4-4H4v16zM9 3h2v4h4l-6-6v2z"/>
-                        <path d="M7 13h6v1H7v-1zm0-2h6v1H7v-1zm0-2h6v1H7v-1z"/>
-                    </svg>
-                    <div>
-                        <h4 class="font-medium text-gray-800">${title}</h4>
-                        <p class="text-sm text-gray-500">Click to view document</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // Close dropdowns on outside click
-    document.addEventListener('click', function() {
-        dropdowns.forEach(({ menu }) => {
-            document.getElementById(menu).classList.add('hidden');
-        });
-    });
-    
-    // Initialize content
-    updateDynamicContent();
-    
-    console.log('✅ Enhanced dropdown system initialized');
+  });
 });
+
+// Dropdown option selection
+document.querySelectorAll(".dropdown li").forEach(item => {
+  item.addEventListener("click", (e) => {
+    e.stopPropagation();
+    
+    const dropdown = item.parentElement;
+    const filterType = dropdown.dataset.filter;
+    const value = item.dataset.value;
+    
+    // Update filter
+    filters[filterType] = value;
+    
+    // Update selected state
+    dropdown.querySelectorAll("li").forEach(li => li.classList.remove("selected"));
+    item.classList.add("selected");
+    
+    // Close dropdown
+    dropdown.classList.remove("show");
+    
+    // Re-render
+    renderCards();
+    
+    console.log(`Filter applied: ${filterType} = ${value}`);
+  });
+});
+
+// Close dropdowns on outside click
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".relative")) {
+    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
+  }
+});
+
+// Clear all filters
+clearBtn.addEventListener("click", () => {
+  // Reset filters
+  for (let key in filters) {
+    filters[key] = "All";
+  }
+  
+  // Reset selected states
+  document.querySelectorAll(".dropdown li").forEach(li => {
+    li.classList.remove("selected");
+    if (li.dataset.value === "All") {
+      li.classList.add("selected");
+    }
+  });
+  
+  // Re-render
+  renderCards();
+  
+  console.log("All filters cleared");
+});
+
+// Keyboard support
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
+  }
+});
+
+// Initial render
+renderCards();
+
+console.log("✅ SJC Grove - Enhanced Tab Navigation Ready!");

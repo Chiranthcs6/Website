@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔐 SJC Grove Login page loaded');
-    
+
     const loginForm = document.getElementById('login-form');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loginForm.addEventListener('submit', async function(event) {
         event.preventDefault();
-        
+
         const email = emailInput.value.trim();
         const password = passwordInput.value.trim();
 
@@ -21,29 +21,44 @@ document.addEventListener('DOMContentLoaded', function() {
         loginBtn.textContent = 'Verifying...';
 
         try {
-            // Updated API call to match backend specification
-            const apiResponse = await fetch('/api/user/login', {
-                method: 'PUT',  // Changed to PUT as per API spec
+            // ============================================================
+            // 📤 REQUEST: Send login data to backend server
+            // ============================================================
+            const apiResponse = await fetch('/api/login', {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email_string,
-                    passwordHash: pwd_string  // Changed to passwordhash as per API spec
+                    email: email,        // 📧 email string
+                    passwordHash: password   // 🔐 plain password (no hashing)
                 })
             });
+            // ============================================================
 
             if (!apiResponse.ok) {
                 throw new Error(`HTTP ${apiResponse.status}: ${apiResponse.statusText}`);
             }
 
+            // ============================================================
+            // 📥 RECEIVE: Get response data from backend server
+            // ============================================================
             const responseData = await apiResponse.json();
             
+            // Expected response format:
+            // {
+            //   valid: boolean,        // ✅ true/false
+            //   error: string,         // ❌ error message if valid=false
+            //   session_token: string  // 🎫 session token if valid=true
+            // }
+            // ============================================================
+
             if (responseData.valid) {
-                localStorage.setItem('token', responseData.token);  // Changed to 'token' from API response
+                // Store session data and redirect
+                localStorage.setItem('session_token', responseData.session_token);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
-                
+
                 alert('Login successful! Welcome to SJC Grove.');
                 window.location.href = '../mainPage.html';
             } else {

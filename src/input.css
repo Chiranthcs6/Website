@@ -1,27 +1,38 @@
 @font-face {
-    font-family: 'Inter';
-    src: url('/fonts/Inter-Regular.woff2') format('woff2');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Inter';
-    src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Inter';
+  src: url('/fonts/Inter-SemiBold.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Inter';
-    src: url('/fonts/Inter-Bold.woff2') format('woff2');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ✅ Custom styles for dropdowns */
+.nav-btn {
+  @apply px-3 py-2 bg-gray-100 rounded hover:bg-gray-200;
+}
+.dropdown {
+  @apply absolute bg-white shadow-md rounded mt-2 w-40 z-50;
+}
+.dropdown li {
+  @apply px-3 py-2 hover:bg-gray-100 cursor-pointer;
+}

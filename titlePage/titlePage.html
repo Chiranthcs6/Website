@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document Details</title>
+  <link rel="stylesheet" href="../dist/style.css">
+</head>
+<body class="bg-gray-50 min-h-screen">
+  
+  <!-- Title -->
+  <header class="bg-white shadow p-4">
+    <h1 id="doc-title" class="text-2xl font-bold text-gray-800"></h1>
+  </header>
+
+  <!-- Info bar -->
+  <div class="flex justify-between items-center bg-white shadow p-4">
+    <div>
+      <p><strong>Scheme:</strong> <span id="doc-scheme"></span></p>
+      <p><strong>Branch:</strong> <span id="doc-branch"></span></p>
+      <p><strong>Semester:</strong> <span id="doc-sem"></span></p>
+      <p><strong>Year:</strong> <span id="doc-year"></span></p>
+    </div>
+    <div class="flex items-center gap-4">
+      <p><strong>Publisher:</strong> <span id="doc-publisher"></span></p>
+      <button id="likeBtn" class="px-3 py-1 bg-green-500 text-white rounded">👍</button>
+      <button id="dislikeBtn" class="px-3 py-1 bg-red-500 text-white rounded">👎</button>
+    </div>
+  </div>
+
+  <!-- PDF viewer -->
+  <main class="p-6">
+    <a id="doc-download" href="#" download class="mb-4 inline-block px-4 py-2 bg-blue-500 text-white rounded">
+      View / Download
+    </a>
+    <div class="border rounded-lg shadow overflow-hidden">
+      <iframe id="doc-file" src="" class="w-full h-[600px]"></iframe>
+    </div>
+  </main>
+
+  <script src="document.js"></script>
+</body>
+</html>
