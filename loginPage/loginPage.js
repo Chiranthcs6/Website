@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,        // 📧 email string
-                    passwordHash: password   // 🔐 plain password (no hashing)
+                    email: email_string,        // 📧 email string
+                    passwordHash: pwd_hash   // 🔐 plain password (no hashing)
                 })
             });
             // ============================================================
