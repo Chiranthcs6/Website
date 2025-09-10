@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📝 SJC Grove Signup page with API integration loaded');
+    console.log('📝 SJC Grove Signup page loaded');
 
     const signupForm = document.getElementById('signup-form');
     const emailInput = document.getElementById('email');
@@ -26,28 +26,15 @@ document.addEventListener('DOMContentLoaded', function() {
         signupBtn.textContent = 'Creating Account...';
 
         try {
-            // 🔢 STEP 1: Hash password with Argon2 (client-side)
-            const hashResult = await argon2.hash({
-                pass: password,
-                salt: new TextEncoder().encode(email + 'saltsecret'), // Use email+secret as salt
-                time: 1,
-                mem: 1024,
-                parallelism: 1,
-                hashLen: 32,
-                type: argon2.ArgonType.Argon2id
-            });
-
-            const pwdhash = hashResult.encoded;
-
-            // 🔢 STEP 2: Send API request to backend
-            const apiResponse = await fetch('/api/signup', { // ⚠️ TODO: Replace with your backend URL
+            // Send credentials directly (no hashing)
+            const apiResponse = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,      // 📧 email string
-                    pwdhash: pwdhash   // 🔐 pwdhash string
+                    email: email,
+                    password: password  // Changed from pwdhash to password
                 })
             });
 
@@ -55,18 +42,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 throw new Error(`HTTP ${apiResponse.status}: ${apiResponse.statusText}`);
             }
 
-            // 🔢 STEP 3: Parse response from backend
             const responseData = await apiResponse.json();
             
-            // Expected response format:
-            // {
-            //   valid: boolean,        // ✅ true/false
-            //   error: string,         // ❌ error message if valid=false
-            //   session_token: string  // 🎫 session token if valid=true
-            // }
-
             if (responseData.valid) {
-                // 🔢 STEP 4: Store session data and redirect
                 localStorage.setItem('session_token', responseData.session_token);
                 localStorage.setItem('isLoggedIn', 'true');
                 localStorage.setItem('userEmail', email);
@@ -86,5 +64,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    console.log('✅ Signup with API integration initialized');
+    // Enter key support
+    emailInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            passwordInput.focus();
+        }
+    });
+
+    passwordInput.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            signupForm.dispatchEvent(new Event('submit'));
+        }
+    });
+
+    console.log('✅ Signup form initialized');
 });
