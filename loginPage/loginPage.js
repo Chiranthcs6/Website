@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     email: email,        // 📧 email string
-                    password: passwords   // 🔐 plain password (no hashing)
+                    password: password   // 🔐 plain password (no hashing)
                 })
             });
             // ============================================================
