@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('userEmail', email);
 
                 alert('Login successful! Welcome to SJC Grove.');
-                window.location.href = '../mainPage.html';
+                window.location.href = '../mainPage/mainPage.html';
             } else {
                 alert('Login failed: ' + (responseData.error || 'Invalid credentials'));
             }
