@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // ============================================================
             // 📤 REQUEST: Send login data to backend server
             // ============================================================
-            const apiResponse = await fetch('/api/login', {
+            const apiResponse = await fetch('/api/user/login', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
