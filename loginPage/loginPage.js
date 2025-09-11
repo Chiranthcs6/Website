@@ -55,9 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (responseData.valid) {
                 // Store session data and redirect
-                document.cookie.setItem('session_token', responseData.session_token);
-                document.cookie.setItem('isLoggedIn', 'true');
-                document.cookie.setItem('userEmail', email);
+                document.cookie('session_token', responseData.session_token);
+                document.cookie('isLoggedIn', 'true');
+                document.cookie('userEmail', email);
 
                 alert('Login successful! Welcome to SJC Grove.');
                 window.location.href = '../mainPage/mainPage.html';
