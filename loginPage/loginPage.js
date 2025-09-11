@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        loginBtn.disabled = true;
+        loginBtn.disabled = false;
         loginBtn.textContent = 'Verifying...';
 
         try {
