@@ -53,15 +53,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // }
             // ============================================================
 
-            if (responseData.valid) {
-                // Store session data and redirect
-                document.cookie('session_token', responseData.session_token);
-                document.cookie('isLoggedIn', 'true');
-                document.cookie('userEmail', email);
+if (responseData.valid) {
+    // Store session data and redirect
+    document.cookie = `session_token=${responseData.session_token}; path=/`;
+    document.cookie = `isLoggedIn=true; path=/`;
+    document.cookie = `userEmail=${email}; path=/`;
 
-                alert('Login successful! Welcome to SJC Grove.');
-                window.location.href = '../mainPage/mainPage.html';
-            } else {
+    alert('Login successful! Welcome to SJC Grove.');
+    window.location.href = '../mainPage/mainPage.html';
+}
+ else {
                 alert('Login failed: ' + (responseData.error || 'Invalid credentials'));
             }
 
