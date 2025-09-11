@@ -26,20 +26,20 @@ document.addEventListener('DOMContentLoaded', function() {
         // Extract username from email (part before @)
         const username = email.split('@')[0];
 
-        signupBtn.disabled = true;
+        signupBtn.disabled = false;
         signupBtn.textContent = 'Creating Account...';
 
         try {
             // 📤 REQUEST: Send signup data to backend
-            const apiResponse = await fetch('/api/users/signup', {
+            const apiResponse = await fetch('http://172.16.6.70:8080/api/users/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email_string,
+                    email: email,
                     name: username,
-                    passwordHash: pwd_hash  // ✅ Plain password (no hashing)
+                    password: password  // ✅ Plain password (no hashing)
                 })
             });
 
