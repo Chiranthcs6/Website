@@ -50,76 +50,7 @@ const dummyData = [
         desc: "Complete DBMS concepts covering SQL, normalization, and database design.",
         icon: "🗄️"
     },
-    {
-        id: 6,
-        title: "Computer Networks Fundamentals",
-        scheme: "2024",
-        branch: "Computer Science",
-        subject: "Networks",
-        year: "3rd Year",
-        desc: "Network protocols, OSI model, TCP/IP, and network security essentials.",
-        icon: "🌐"
-    },
-    {
-        id: 7,
-        title: "Software Engineering Principles",
-        scheme: "2022",
-        branch: "Computer Science",
-        subject: "Software Engineering",
-        year: "4th Year",
-        desc: "Software development lifecycle, testing, and project management methodologies.",
-        icon: "🔧"
-    },
-    {
-        id: 8,
-        title: "Operating Systems Concepts",
-        scheme: "2020",
-        branch: "Computer Science",
-        subject: "Operating Systems",
-        year: "3rd Year",
-        desc: "Process management, memory allocation, file systems, and system calls.",
-        icon: "⚙️"
-    },
-    {
-        id: 9,
-        title: "Digital Electronics Lab",
-        scheme: "2024",
-        branch: "Electronics",
-        subject: "Digital Electronics",
-        year: "2nd Year",
-        desc: "Logic gates, flip-flops, counters, and digital circuit design experiments.",
-        icon: "🔌"
-    },
-    {
-        id: 10,
-        title: "Engineering Mechanics",
-        scheme: "2022",
-        branch: "Mechanical",
-        subject: "Mechanics",
-        year: "2nd Year",
-        desc: "Statics, dynamics, and strength of materials for mechanical engineers.",
-        icon: "🔩"
-    },
-    {
-        id: 11,
-        title: "Structural Analysis",
-        scheme: "2020",
-        branch: "Civil",
-        subject: "Structures",
-        year: "3rd Year",
-        desc: "Analysis of beams, trusses, and frames using classical methods.",
-        icon: "🏗️"
-    },
-    {
-        id: 12,
-        title: "Electrical Circuits",
-        scheme: "2024",
-        branch: "Electrical",
-        subject: "Circuits",
-        year: "2nd Year",
-        desc: "AC/DC circuit analysis, network theorems, and electrical measurements.",
-        icon: "⚡"
-    }
+    // Add more data as needed...
 ];
 
 // DOM elements
@@ -129,192 +60,212 @@ const resultsTitle = document.getElementById("results-title");
 const noResults = document.getElementById("no-results");
 const filterCount = document.getElementById("filter-count");
 
-// Updated filter state for CS Engineering
+// Filter state
 const filters = {
-  scheme: "All",
-  branch: "All",
-  subject: "All",
-  year: "All",
+    scheme: "All",
+    branch: "All", 
+    subject: "All",
+    year: "All"
 };
 
-// Enhanced render function
+// Render cards function
 function renderCards() {
-  contentDiv.innerHTML = "";
-  
-  // Filter the data
-  const filtered = dummyData.filter(item => {
-    return (filters.scheme === "All" || item.scheme === filters.scheme) &&
-           (filters.branch === "All" || item.branch === filters.branch) &&
-           (filters.subject === "All" || item.subject === filters.subject) &&
-           (filters.year === "All" || item.year === filters.year);
-  });
-
-  // Update results title
-  resultsTitle.textContent = `${filtered.length === dummyData.length ? 'All Documents' : 'Filtered Documents'} (${filtered.length})`;
-  
-  // Update filter count
-  const activeFilters = Object.values(filters).filter(f => f !== "All").length;
-  if (activeFilters > 0) {
-    filterCount.textContent = `${activeFilters} filter(s) active`;
-  } else {
-    filterCount.textContent = "";
-  }
-
-  // Show/hide no results
-  if (filtered.length === 0) {
-    contentDiv.classList.add("hidden");
-    noResults.classList.remove("hidden");
-    return;
-  } else {
-    contentDiv.classList.remove("hidden");
-    noResults.classList.add("hidden");
-  }
-
-  // Create cards with enhanced styling
-  filtered.forEach((item, index) => {
-    const card = document.createElement("div");
-    card.className = "card bg-white shadow-md rounded-lg p-6 hover:shadow-lg border border-gray-200 cursor-pointer";
+    contentDiv.innerHTML = "";
     
-    // Year badge colors
-    const yearColors = {
-      "1st Year": "bg-green-100 text-green-800",
-      "2nd Year": "bg-blue-100 text-blue-800",
-      "3rd Year": "bg-yellow-100 text-yellow-800",
-      "4th Year": "bg-red-100 text-red-800"
-    };
-
-    card.innerHTML = `
-      <div class="flex items-start justify-between mb-4">
-        <div class="text-3xl">${item.icon}</div>
-        <span class="px-2 py-1 rounded-full text-xs font-medium ${yearColors[item.year]}">${item.year}</span>
-      </div>
-      
-      <h3 class="text-lg font-semibold text-gray-900 mb-2">${item.title}</h3>
-      <p class="text-gray-600 text-sm mb-4">${item.desc}</p>
-      
-      <div class="flex flex-wrap gap-2 mb-4 text-xs">
-        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">Scheme ${item.scheme}</span>
-        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">${item.branch}</span>
-        <span class="px-2 py-1 bg-green-100 text-green-700 rounded">${item.subject}</span>
-      </div>
-      
-      <button class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center w-full justify-center">
-        View Document 
-        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-        </svg>
-      </button>
-    `;
-    
-    // Add click handler to navigate to titlePage with document ID
-    card.addEventListener('click', () => {
-      console.log(`Opening document: ${item.title} (ID: ${item.id})`);
-      window.location.href = `titlePage.html?id=${item.id}`;
+    // Filter the data
+    const filtered = dummyData.filter(item => {
+        return (filters.scheme === "All" || item.scheme === filters.scheme) &&
+               (filters.branch === "All" || item.branch === filters.branch) &&
+               (filters.subject === "All" || item.subject === filters.subject) &&
+               (filters.year === "All" || item.year === filters.year);
     });
-    
-    contentDiv.appendChild(card);
-  });
 
-  // Update filter indicators
-  updateFilterIndicators();
-}
-
-// Update filter indicators on tabs
-function updateFilterIndicators() {
-  document.querySelectorAll('.nav-tab').forEach(tab => {
-    const filterType = tab.dataset.filter;
-    const indicator = tab.querySelector('.filter-indicator');
+    // Update results title
+    resultsTitle.textContent = `${filtered.length === dummyData.length ? 'All Documents' : 'Filtered Documents'} (${filtered.length})`;
     
-    if (filters[filterType] !== "All") {
-      indicator.classList.remove('hidden');
-      tab.classList.add('active');
+    // Update filter count
+    const activeFilters = Object.values(filters).filter(f => f !== "All").length;
+    filterCount.textContent = activeFilters > 0 ? `${activeFilters} filter(s) active` : "";
+
+    // Show/hide no results
+    if (filtered.length === 0) {
+        contentDiv.classList.add("hidden");
+        noResults.classList.remove("hidden");
+        return;
     } else {
-      indicator.classList.add('hidden');
-      tab.classList.remove('active');
+        contentDiv.classList.remove("hidden");
+        noResults.classList.add("hidden");
     }
-  });
+
+    // Create cards
+    filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card bg-white shadow-md rounded-lg p-6 hover:shadow-lg border border-gray-200 cursor-pointer";
+        
+        const yearColors = {
+            "1st Year": "bg-green-100 text-green-800",
+            "2nd Year": "bg-blue-100 text-blue-800", 
+            "3rd Year": "bg-yellow-100 text-yellow-800",
+            "4th Year": "bg-red-100 text-red-800"
+        };
+
+        card.innerHTML = `
+            <div class="flex items-start justify-between mb-4">
+                <div class="text-3xl">${item.icon}</div>
+                <span class="px-2 py-1 rounded-full text-xs font-medium ${yearColors[item.year]}">${item.year}</span>
+            </div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">${item.title}</h3>
+            <p class="text-gray-600 text-sm mb-4">${item.desc}</p>
+            <div class="flex flex-wrap gap-2 mb-4 text-xs">
+                <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded">Scheme ${item.scheme}</span>
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded">${item.branch}</span>
+                <span class="px-2 py-1 bg-green-100 text-green-700 rounded">${item.subject}</span>
+            </div>
+            <button class="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center w-full justify-center">
+                View Document 
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        `;
+        
+        card.addEventListener('click', () => {
+            console.log(`Opening document: ${item.title} (ID: ${item.id})`);
+            window.location.href = `../titlePage/titlePage.html?id=${item.id}`;
+        });
+        
+        contentDiv.appendChild(card);
+    });
 }
 
-// Tab click handlers
+// Update filter indicators
+function updateFilterIndicators() {
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+        const filterType = tab.getAttribute('data-filter');
+        const indicator = tab.querySelector('.filter-indicator');
+        
+        if (filters[filterType] !== "All") {
+            if (indicator) indicator.classList.remove('hidden');
+            tab.classList.add('active');
+        } else {
+            if (indicator) indicator.classList.add('hidden');
+            tab.classList.remove('active');
+        }
+    });
+}
+
+// =============================================================================
+// DROPDOWN EVENT HANDLERS - Fixed for your HTML structure
+// =============================================================================
+
+// 1. Button click handlers
 document.querySelectorAll(".nav-tab").forEach(tab => {
-  tab.addEventListener("click", (e) => {
-    e.stopPropagation();
-    
-    const dropdown = tab.nextElementSibling;
-    const isOpen = dropdown.classList.contains("show");
-    
-    // Close all dropdowns
-    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
-    
-    // Toggle current dropdown
-    if (!isOpen) {
-      dropdown.classList.add("show");
-    }
-  });
+    tab.addEventListener("click", (e) => {
+        e.stopPropagation();
+        
+        const dropdown = tab.nextElementSibling;
+        const isOpen = dropdown.classList.contains("show");
+        
+        // Close all dropdowns
+        document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
+        
+        // Toggle current dropdown  
+        if (!isOpen) {
+            dropdown.classList.add("show");
+        }
+    });
 });
 
-// Dropdown option selection
-document.querySelectorAll(".dropdown li").forEach(item => {
-  item.addEventListener("click", (e) => {
-    e.stopPropagation();
-    
-    const dropdown = item.parentElement;
-    const filterType = dropdown.dataset.filter;
-    const value = item.dataset.value;
-    
-    // Update filter
-    filters[filterType] = value;
-    
-    // Update selected state
-    dropdown.querySelectorAll("li").forEach(li => li.classList.remove("selected"));
-    item.classList.add("selected");
-    
-    // Close dropdown
-    dropdown.classList.remove("show");
-    
-    // Re-render
-    renderCards();
-    
-    console.log(`Filter applied: ${filterType} = ${value}`);
-  });
+// 2. Dropdown option selection - Fixed for <li> elements
+document.querySelectorAll(".dropdown").forEach(dropdown => {
+    dropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+        
+        // Check if clicked element is an <li> with data-value
+        if (e.target.tagName === 'LI' && e.target.hasAttribute('data-value')) {
+            const value = e.target.getAttribute('data-value');
+            const filterType = dropdown.getAttribute('data-filter');
+            const button = dropdown.previousElementSibling;
+            
+            // Update filter state
+            filters[filterType] = value;
+            
+            // Update button text while preserving indicator
+            const indicator = button.querySelector('.filter-indicator');
+            if (value === 'All') {
+                button.textContent = filterType.charAt(0).toUpperCase() + filterType.slice(1);
+            } else {
+                button.textContent = e.target.textContent;
+            }
+            if (indicator) button.appendChild(indicator);
+            
+            // Update selected state in dropdown
+            dropdown.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            e.target.classList.add('selected');
+            
+            // Close dropdown
+            dropdown.classList.remove('show');
+            
+            // Re-render cards
+            renderCards();
+            updateFilterIndicators();
+            
+            console.log(`Filter applied: ${filterType} = ${value}`);
+        }
+    });
 });
 
-// Close dropdowns on outside click
+// 3. Close dropdowns on outside click
 document.addEventListener("click", (e) => {
-  if (!e.target.closest(".relative")) {
-    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
-  }
-});
-
-// Clear all filters
-clearBtn.addEventListener("click", () => {
-  // Reset filters
-  for (let key in filters) {
-    filters[key] = "All";
-  }
-  
-  // Reset selected states
-  document.querySelectorAll(".dropdown li").forEach(li => {
-    li.classList.remove("selected");
-    if (li.dataset.value === "All") {
-      li.classList.add("selected");
+    if (!e.target.closest(".relative")) {
+        document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
     }
-  });
-  
-  // Re-render
-  renderCards();
-  
-  console.log("All filters cleared");
 });
 
-// Keyboard support
+// 4. Clear filters button
+if (clearBtn) {
+    clearBtn.addEventListener("click", () => {
+        // Reset filters
+        for (let key in filters) {
+            filters[key] = "All";
+        }
+        
+        // Reset button texts
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            const filterType = tab.getAttribute('data-filter');
+            const indicator = tab.querySelector('.filter-indicator');
+            tab.textContent = filterType.charAt(0).toUpperCase() + filterType.slice(1);
+            if (indicator) tab.appendChild(indicator);
+        });
+        
+        // Reset selected states in dropdowns
+        document.querySelectorAll(".dropdown li").forEach(li => {
+            li.classList.remove('selected');
+            if (li.dataset.value === "All") {
+                li.classList.add('selected');
+            }
+        });
+        
+        // Re-render
+        renderCards();
+        updateFilterIndicators();
+        
+        console.log("All filters cleared");
+    });
+}
+
+// 5. Keyboard support
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") {
-    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
-  }
+    if (e.key === "Escape") {
+        document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
+    }
 });
 
-// Initial render
-renderCards();
+// Initialize on DOM ready
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('📄 SJC Grove Main Page initialized');
+    renderCards();
+    console.log('✅ Main page ready with dropdown navigation!');
+});
 
 console.log("✅ SJC Grove Main Page - Ready with titlePage.html navigation!");

@@ -95,6 +95,15 @@
       border-radius: 50%;
       margin-left: 6px;
     }
+    /* Arrow rotation when dropdown is open */
+    .nav-tab.active svg {
+    transform: rotate(180deg);
+    }
+
+    /* Disabled arrow styling */
+    .nav-tab:disabled svg {
+    opacity: 0.5;
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
