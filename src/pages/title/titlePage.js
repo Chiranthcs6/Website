@@ -414,7 +414,7 @@ function goBack() {
         window.history.back();
     } else {
         // Fallback: redirect to main page with current filters
-        let mainPageURL = '../mainPage/mainPage.html';
+        let mainPageURL = '../src/pages/main/mainPage.html';
         
         if (currentFilterValues) {
             const params = new URLSearchParams();
