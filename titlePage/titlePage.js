@@ -1,3 +1,64 @@
+// =============================================================================
+// RECEIVE AND APPLY FILTER DATA - NEW SECTION
+// =============================================================================
+
+// Function to get URL parameters
+function getURLParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+        id: urlParams.get('id'),
+        scheme: urlParams.get('scheme'),
+        branch: urlParams.get('branch'),
+        semester: urlParams.get('semester'),
+        subject: urlParams.get('subject')
+    };
+}
+
+// Function to get filter values from sessionStorage as fallback
+function getStoredFilterValues() {
+    const stored = sessionStorage.getItem('documentFilters');
+    if (stored) {
+        try {
+            return JSON.parse(stored);
+        } catch (e) {
+            console.warn('Failed to parse stored filter values');
+            return null;
+        }
+    }
+    return null;
+}
+
+// Function to update document info table
+function updateDocumentInfoTable(filterValues) {
+    console.log('Updating document info table with:', filterValues);
+    
+    // Update table cells
+    const schemeCell = document.getElementById('table-scheme');
+    const branchCell = document.getElementById('table-branch');
+    const semesterCell = document.getElementById('table-semester');
+    const subjectCell = document.getElementById('table-subject');
+    
+    if (schemeCell) {
+        schemeCell.textContent = filterValues.scheme ? `${filterValues.scheme} Scheme` : 'All Schemes';
+    }
+    
+    if (branchCell) {
+        branchCell.textContent = filterValues.branch || 'All Branches';
+    }
+    
+    if (semesterCell) {
+        semesterCell.textContent = filterValues.semester ? `Semester ${filterValues.semester}` : 'All Semesters';
+    }
+    
+    if (subjectCell) {
+        subjectCell.textContent = filterValues.subject || 'All Subjects';
+    }
+}
+
+// =============================================================================
+// EXISTING CODE WITH UPDATES
+// =============================================================================
+
 // Dummy document dataset
 const documentDatabase = [
     {
@@ -7,7 +68,7 @@ const documentDatabase = [
         branch: "Computer Science Engineering",
         semester: "1st Semester",
         year: "1st Year",
-        publisher: "SJC Publications",
+        publisher: "StuconPublications",
         fileUrl: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
         likes: 45,
         dislikes: 3
@@ -64,16 +125,32 @@ const documentDatabase = [
 
 // Global variables
 let currentDocument = null;
-let userLikeState = null; // null = no action, 'like' = liked, 'dislike' = disliked
+let userLikeState = null;
+let currentFilterValues = null; // NEW: Store filter values
 
-// Initialize the page when DOM is loaded
+// Initialize the page when DOM is loaded - UPDATED
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📄 Title page viewer initialized');
     
-    // Get document ID from URL parameters
-    const urlParams = new URLSearchParams(window.location.search);
-    const documentId = parseInt(urlParams.get('id'));
+    // ✅ GET FILTER VALUES FROM URL OR SESSION
+    const urlParams = getURLParameters();
+    const storedFilters = getStoredFilterValues();
     
+    // Combine URL params with stored filters (URL takes precedence)
+    currentFilterValues = {
+        scheme: urlParams.scheme || storedFilters?.scheme || null,
+        branch: urlParams.branch || storedFilters?.branch || null,
+        semester: urlParams.semester || storedFilters?.semester || null,
+        subject: urlParams.subject || storedFilters?.subject || null
+    };
+    
+    console.log('Received filter values:', currentFilterValues);
+    
+    // ✅ UPDATE DOCUMENT INFO TABLE
+    updateDocumentInfoTable(currentFilterValues);
+    
+    // Get document ID and load document
+    const documentId = parseInt(urlParams.id);
     console.log('Requested document ID:', documentId);
     
     if (documentId) {
@@ -106,56 +183,83 @@ function loadDocument(id) {
     }, 800); // Simulate network delay
 }
 
-// Display document information
+// Display document information - UPDATED
 function displayDocument(document) {
     // Hide loading and error states
     hideLoading();
     hideError();
     
     // Show document content
-    document.getElementById('document-content').classList.remove('hidden');
+    const documentContent = document.getElementById('document-content');
+    if (documentContent) {
+        documentContent.classList.remove('hidden');
+    }
     
-    // Populate document information
-    document.getElementById('doc-title').textContent = document.title;
-    document.getElementById('doc-scheme').textContent = `Scheme ${document.scheme}`;
-    document.getElementById('doc-branch').textContent = document.branch;
-    document.getElementById('doc-semester').textContent = document.semester;
-    document.getElementById('doc-year').textContent = document.year;
-    document.getElementById('doc-publisher').textContent = document.publisher;
+    // Update document title in the card
+    const titleElement = document.getElementById('document-title');
+    if (titleElement) {
+        titleElement.textContent = document.title;
+    }
+    
+    // Populate document information (if using old HTML structure)
+    const docTitle = document.getElementById('doc-title');
+    const docScheme = document.getElementById('doc-scheme');
+    const docBranch = document.getElementById('doc-branch');
+    const docSemester = document.getElementById('doc-semester');
+    const docYear = document.getElementById('doc-year');
+    const docPublisher = document.getElementById('doc-publisher');
+    
+    if (docTitle) docTitle.textContent = document.title;
+    if (docScheme) docScheme.textContent = `Scheme ${document.scheme}`;
+    if (docBranch) docBranch.textContent = document.branch;
+    if (docSemester) docSemester.textContent = document.semester;
+    if (docYear) docYear.textContent = document.year;
+    if (docPublisher) docPublisher.textContent = document.publisher;
     
     // Update like/dislike counts
-    document.getElementById('like-count').textContent = document.likes;
-    document.getElementById('dislike-count').textContent = document.dislikes;
+    const likeCount = document.getElementById('like-count');
+    const dislikeCount = document.getElementById('dislike-count');
+    if (likeCount) likeCount.textContent = document.likes;
+    if (dislikeCount) dislikeCount.textContent = document.dislikes;
     
     // Load PDF in viewer
     const pdfViewer = document.getElementById('pdf-viewer');
     const fallbackLink = document.getElementById('fallback-link');
     
-    pdfViewer.src = document.fileUrl;
-    fallbackLink.href = document.fileUrl;
+    if (pdfViewer) pdfViewer.src = document.fileUrl;
+    if (fallbackLink) fallbackLink.href = document.fileUrl;
     
     // Update page title
-    document.title = `${document.title} - SJC Grove`;
+    document.title = `${document.title} - StuconGrove`;
     
-    console.log('✅ Document display complete');
+    console.log('✅ Document display complete with filter context');
 }
 
 // Setup event listeners
 function setupEventListeners() {
     // Like button
-    document.getElementById('like-btn').addEventListener('click', function() {
-        handleLike();
-    });
+    const likeBtn = document.getElementById('like-btn');
+    if (likeBtn) {
+        likeBtn.addEventListener('click', function() {
+            handleLike();
+        });
+    }
     
-    // Dislike button  
-    document.getElementById('dislike-btn').addEventListener('click', function() {
-        handleDislike();
-    });
+    // Dislike button
+    const dislikeBtn = document.getElementById('dislike-btn');
+    if (dislikeBtn) {
+        dislikeBtn.addEventListener('click', function() {
+            handleDislike();
+        });
+    }
     
     // Download button
-    document.getElementById('download-btn').addEventListener('click', function() {
-        handleDownload();
-    });
+    const downloadBtn = document.getElementById('download-btn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            handleDownload();
+        });
+    }
     
     console.log('Event listeners setup complete');
 }
@@ -172,26 +276,26 @@ function handleLike() {
     if (userLikeState === 'like') {
         // User is removing their like
         userLikeState = null;
-        likeBtn.classList.remove('active');
+        if (likeBtn) likeBtn.classList.remove('active');
         currentDocument.likes--;
         console.log('👍 Like removed for:', currentDocument.title);
     } else {
         // User is liking (remove dislike if exists)
         if (userLikeState === 'dislike') {
-            dislikeBtn.classList.remove('active');
+            if (dislikeBtn) dislikeBtn.classList.remove('active');
             currentDocument.dislikes--;
         }
         
         userLikeState = 'like';
-        likeBtn.classList.add('active');
-        dislikeBtn.classList.remove('active');
+        if (likeBtn) likeBtn.classList.add('active');
+        if (dislikeBtn) dislikeBtn.classList.remove('active');
         currentDocument.likes++;
         console.log('👍 Document liked:', currentDocument.title);
     }
     
     // Update counts
-    likeCount.textContent = currentDocument.likes;
-    dislikeCount.textContent = currentDocument.dislikes;
+    if (likeCount) likeCount.textContent = currentDocument.likes;
+    if (dislikeCount) dislikeCount.textContent = currentDocument.dislikes;
 }
 
 // Handle dislike button click
@@ -206,26 +310,26 @@ function handleDislike() {
     if (userLikeState === 'dislike') {
         // User is removing their dislike
         userLikeState = null;
-        dislikeBtn.classList.remove('active');
+        if (dislikeBtn) dislikeBtn.classList.remove('active');
         currentDocument.dislikes--;
         console.log('👎 Dislike removed for:', currentDocument.title);
     } else {
         // User is disliking (remove like if exists)
         if (userLikeState === 'like') {
-            likeBtn.classList.remove('active');
+            if (likeBtn) likeBtn.classList.remove('active');
             currentDocument.likes--;
         }
         
         userLikeState = 'dislike';
-        dislikeBtn.classList.add('active');
-        likeBtn.classList.remove('active');
+        if (dislikeBtn) dislikeBtn.classList.add('active');
+        if (likeBtn) likeBtn.classList.remove('active');
         currentDocument.dislikes++;
         console.log('👎 Document disliked:', currentDocument.title);
     }
     
     // Update counts
-    likeCount.textContent = currentDocument.likes;
-    dislikeCount.textContent = currentDocument.dislikes;
+    if (likeCount) likeCount.textContent = currentDocument.likes;
+    if (dislikeCount) dislikeCount.textContent = currentDocument.dislikes;
 }
 
 // Handle download button click
@@ -252,6 +356,8 @@ function handleDownload() {
 // Show download feedback
 function showDownloadFeedback() {
     const downloadBtn = document.getElementById('download-btn');
+    if (!downloadBtn) return;
+    
     const originalContent = downloadBtn.innerHTML;
     
     downloadBtn.innerHTML = `
@@ -268,41 +374,66 @@ function showDownloadFeedback() {
 
 // Show loading state
 function showLoading() {
-    document.getElementById('loading-state').classList.remove('hidden');
-    document.getElementById('error-state').classList.add('hidden');
-    document.getElementById('document-content').classList.add('hidden');
+    const loadingState = document.getElementById('loading-state');
+    const errorState = document.getElementById('error-state');
+    const documentContent = document.getElementById('document-content');
+    
+    if (loadingState) loadingState.classList.remove('hidden');
+    if (errorState) errorState.classList.add('hidden');
+    if (documentContent) documentContent.classList.add('hidden');
 }
 
 // Hide loading state
 function hideLoading() {
-    document.getElementById('loading-state').classList.add('hidden');
+    const loadingState = document.getElementById('loading-state');
+    if (loadingState) loadingState.classList.add('hidden');
 }
 
 // Show error state
 function showError(message) {
     hideLoading();
-    document.getElementById('error-state').classList.remove('hidden');
-    document.getElementById('document-content').classList.add('hidden');
+    const errorState = document.getElementById('error-state');
+    const documentContent = document.getElementById('document-content');
+    
+    if (errorState) errorState.classList.remove('hidden');
+    if (documentContent) documentContent.classList.add('hidden');
     
     console.error('Error:', message);
 }
 
 // Hide error state
 function hideError() {
-    document.getElementById('error-state').classList.add('hidden');
+    const errorState = document.getElementById('error-state');
+    if (errorState) errorState.classList.add('hidden');
 }
 
-// Go back to main page
+// Go back to main page - UPDATED to preserve filters
 function goBack() {
-    window.history.back();
-    
-    // Fallback if history is empty
-    setTimeout(() => {
-        window.location.href = 'mainPage.html';
-    }, 100);
+    // Try to go back in history first
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        // Fallback: redirect to main page with current filters
+        let mainPageURL = '../mainPage/mainPage.html';
+        
+        if (currentFilterValues) {
+            const params = new URLSearchParams();
+            Object.entries(currentFilterValues).forEach(([key, value]) => {
+                if (value && value !== 'All') {
+                    params.append(key, value);
+                }
+            });
+            
+            if (params.toString()) {
+                mainPageURL += `?${params.toString()}`;
+            }
+        }
+        
+        window.location.href = mainPageURL;
+    }
 }
 
 // Make goBack function globally available
 window.goBack = goBack;
 
-console.log('✅ Title page viewer script loaded successfully');
+console.log('✅ Title page viewer script loaded with filter support');

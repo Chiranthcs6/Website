@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📝 SJC Grove Signup page loaded');
+    console.log('📝 Stucon Signup page loaded');
     
     const signupForm = document.getElementById('signup-form');
     const emailInput = document.getElementById('email');
@@ -53,11 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check response structure: {valid: boolean, token: string}
             if (responseData.valid) {
                 // Store authentication data
-                localStorage.setItem('session_token', responseData.token);
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userEmail', email);
+                document.cookie('session_token', responseData.token);
+                document.cookie('isLoggedIn', 'true');
+                document.cookie('userEmail', email);
                 
-                alert('Account created successfully! Welcome to SJC Grove.');
+                
                 
                 // Redirect to main page
                 window.location.href = '../mainPage/mainPage.html';

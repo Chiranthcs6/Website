@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SJC Grove - Main Page</title>
+  <title>Stucon - Main Page</title>
   <link rel="stylesheet" href="../dist/style.css">
   <style>
     /* Simple, clean dropdown styles */
@@ -95,14 +95,15 @@
       border-radius: 50%;
       margin-left: 6px;
     }
+    
     /* Arrow rotation when dropdown is open */
     .nav-tab.active svg {
-    transform: rotate(180deg);
+      transform: rotate(180deg);
     }
-
+    
     /* Disabled arrow styling */
     .nav-tab:disabled svg {
-    opacity: 0.5;
+      opacity: 0.5;
     }
   </style>
 </head>
@@ -118,12 +119,46 @@
           <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
             SJC
           </div>
-          <span class="font-bold text-xl text-gray-800">SJC Grove</span>
+          <span class="font-bold text-xl text-gray-800">Stucon</span>
         </div>
-
+        
+        <!-- Center Actions - Upload Button -->
+        <div class="hidden md:flex items-center space-x-4">
+          <button 
+            id="upload-btn" 
+            class="flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-medium shadow-sm hover:shadow-md transform hover:scale-105"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+            <span>Upload Document</span>
+          </button>
+        </div>
+        
         <!-- User Info -->
         <div class="flex items-center space-x-4">
-          <span class="hidden sm:block text-gray-600 font-medium">Hello, Student</span>
+          <!-- Mobile Upload Button -->
+          <button 
+            id="upload-btn-mobile" 
+            class="md:hidden bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg transition-colors"
+            title="Upload Document"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+            </svg>
+          </button>
+          
+          <div class="hidden sm:flex items-center space-x-2">
+            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-bold" id="user-avatar">
+              U
+            </div>
+            <div class="flex flex-col">
+              <span class="text-gray-600 font-medium text-sm">Hello,</span>
+              <span class="text-gray-800 font-semibold text-sm" id="username-display">
+                Student
+              </span>
+            </div>
+          </div>
           <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium">
             Logout
           </button>
@@ -131,81 +166,80 @@
       </div>
       
       <!-- Navigation Tabs -->
-<div class="nav-tabs">
-  
-  <!-- Scheme Tab -->
-  <div class="relative">
-    <button class="nav-tab" data-filter="scheme">
-      Scheme
-      <span class="filter-indicator hidden"></span>
-    </button>
-    <ul class="dropdown" data-filter="scheme">
-      <li data-value="All" class="selected">All Schemes</li>
-      <li data-value="2018">Scheme 2018</li>
-      <li data-value="2020">Scheme 2020</li>
-      <li data-value="2022">Scheme 2022</li>
-      <li data-value="2024">Scheme 2024</li>
-    </ul>
-  </div>
-
-  <!-- Branch Tab -->
-  <div class="relative">
-    <button class="nav-tab" data-filter="branch">
-      Branch
-      <span class="filter-indicator hidden"></span>
-    </button>
-    <ul class="dropdown" data-filter="branch">
-      <li data-value="All" class="selected">All Branches</li>
-      <li data-value="Computer Science">Computer Science Engineering</li>
-      <li data-value="Electronics">Electronics & Communication</li>
-      <li data-value="Mechanical">Mechanical Engineering</li>
-      <li data-value="Civil">Civil Engineering</li>
-      <li data-value="Electrical">Electrical Engineering</li>
-    </ul>
-  </div>
-
-  <!-- Semester Tab -->
-  <div class="relative">
-    <button class="nav-tab" data-filter="semester">
-      Semester
-      <span class="filter-indicator hidden"></span>
-    </button>
-    <ul class="dropdown" data-filter="semester">
-      <li data-value="All" class="selected">All Semesters</li>
-      <li data-value="1">Semester 1</li>
-      <li data-value="2">Semester 2</li>
-      <li data-value="3">Semester 3</li>
-      <li data-value="4">Semester 4</li>
-      <li data-value="5">Semester 5</li>
-      <li data-value="6">Semester 6</li>
-      <li data-value="7">Semester 7</li>
-      <li data-value="8">Semester 8</li>
-    </ul>
-  </div>
-
-  <!-- Subject Tab -->
-  <div class="relative">
-    <button class="nav-tab" data-filter="subject">
-      Subject
-      <span class="filter-indicator hidden"></span>
-    </button>
-    <ul class="dropdown" data-filter="subject" id="subject-dropdown">
-      <li data-value="All" class="selected">All Subjects</li>
-      <li data-value="Mathematics">Mathematics - I</li>
-      <li data-value="Physics">Physics for Engineers</li>
-      <li data-value="Programming">Programming in C</li>
-      <li data-value="Data Structures">Data Structures</li>
-      <li data-value="DBMS">Database Management</li>
-      <li data-value="Networks">Computer Networks</li>
-      <li data-value="Software Engineering">Software Engineering</li>
-      <li data-value="Operating Systems">Operating Systems</li>
-    </ul>
-  </div>
-</div>
-
+      <div class="nav-tabs">
+        
+        <!-- Scheme Tab -->
+        <div class="relative">
+          <button class="nav-tab" data-filter="scheme">
+            Scheme
+            <span class="filter-indicator hidden"></span>
+          </button>
+          <ul class="dropdown" data-filter="scheme">
+            <li data-value="All" class="selected">All Schemes</li>
+            <li data-value="2018">Scheme 2018</li>
+            <li data-value="2020">Scheme 2020</li>
+            <li data-value="2022">Scheme 2022</li>
+            <li data-value="2024">Scheme 2024</li>
+          </ul>
+        </div>
+        
+        <!-- Branch Tab -->
+        <div class="relative">
+          <button class="nav-tab" data-filter="branch">
+            Branch
+            <span class="filter-indicator hidden"></span>
+          </button>
+          <ul class="dropdown" data-filter="branch">
+            <li data-value="All" class="selected">All Branches</li>
+            <li data-value="Computer Science">Computer Science Engineering</li>
+            <li data-value="Electronics">Electronics & Communication</li>
+            <li data-value="Mechanical">Mechanical Engineering</li>
+            <li data-value="Civil">Civil Engineering</li>
+            <li data-value="Electrical">Electrical Engineering</li>
+          </ul>
+        </div>
+        
+        <!-- Semester Tab -->
+        <div class="relative">
+          <button class="nav-tab" data-filter="semester">
+            Semester
+            <span class="filter-indicator hidden"></span>
+          </button>
+          <ul class="dropdown" data-filter="semester">
+            <li data-value="All" class="selected">All Semesters</li>
+            <li data-value="1">Semester 1</li>
+            <li data-value="2">Semester 2</li>
+            <li data-value="3">Semester 3</li>
+            <li data-value="4">Semester 4</li>
+            <li data-value="5">Semester 5</li>
+            <li data-value="6">Semester 6</li>
+            <li data-value="7">Semester 7</li>
+            <li data-value="8">Semester 8</li>
+          </ul>
+        </div>
+        
+        <!-- Subject Tab -->
+        <div class="relative">
+          <button class="nav-tab" data-filter="subject">
+            Subject
+            <span class="filter-indicator hidden"></span>
+          </button>
+          <ul class="dropdown" data-filter="subject" id="subject-dropdown">
+            <li data-value="All" class="selected">All Subjects</li>
+            <li data-value="Mathematics">Mathematics - I</li>
+            <li data-value="Physics">Physics for Engineers</li>
+            <li data-value="Programming">Programming in C</li>
+            <li data-value="Data Structures">Data Structures</li>
+            <li data-value="DBMS">Database Management</li>
+            <li data-value="Networks">Computer Networks</li>
+            <li data-value="Software Engineering">Software Engineering</li>
+            <li data-value="Operating Systems">Operating Systems</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </nav>
-
+  
   <!-- Clear Filters Button -->
   <div class="bg-white border-b border-gray-200 py-3">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -215,20 +249,20 @@
       <span id="filter-count" class="ml-4 text-gray-600 text-sm"></span>
     </div>
   </div>
-
+  
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
     <!-- Results Header -->
     <div class="mb-6">
-      <h2 id="results-title" class="text-2xl font-bold text-gray-800">All Documents (12)</h2>
+      <h2 id="results-title" class="text-2xl font-bold text-gray-800">All Documents (26)</h2>
     </div>
-
+    
     <!-- Content Grid -->
     <div id="content" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <!-- Cards dynamically inserted here -->
     </div>
-
+    
     <!-- No Results -->
     <div id="no-results" class="hidden text-center py-12">
       <div class="text-gray-400 mb-4">
@@ -240,7 +274,7 @@
       <p class="text-gray-500">Try adjusting your filters to see more results</p>
     </div>
   </main>
-
+  
   <script src="mainPage.js"></script>
 </body>
 </html>

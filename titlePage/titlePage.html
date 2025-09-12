@@ -3,171 +3,409 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document Viewer - SJC Grove</title>
-    <link href="dist/style.css" rel="stylesheet">
+    <title>Document Viewer - Stucon</title>
+    <link href="../dist/style.css" rel="stylesheet">
     <style>
-        .pdf-container {
-            min-height: 600px;
+        /* Custom CSS for the new layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-        .like-btn, .dislike-btn {
+        
+        /* Header Section */
+        .header-section {
+            margin-bottom: 30px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f3f4f6;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
             transition: all 0.2s ease;
         }
-        .like-btn.active {
-            background-color: #22c55e;
-            color: white;
+        
+        .back-button:hover {
+            background: #e5e7eb;
+            border-color: #9ca3af;
         }
-        .dislike-btn.active {
-            background-color: #ef4444;
-            color: white;
+        
+        /* Document Info Table */
+        .document-info-table {
+            width: 100%;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
+        
+        .document-info-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .document-info-table th {
+            background: #f8fafc;
+            padding: 16px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .document-info-table td {
+            padding: 16px 20px;
+            color: #6b7280;
+            border-bottom: 1px solid #f3f4f6;
+            font-weight: 500;
+        }
+        
+        .document-info-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        /* Document Card */
+        .document-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+        
+        .document-card-header {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .document-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        .document-card-body {
+            padding: 24px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .document-content {
+            flex: 1;
+            background: #f9fafb;
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+        
+        .content-placeholder {
+            color: #9ca3af;
+            font-size: 16px;
+        }
+        
+        .document-icon {
+            width: 48px;
+            height: 48px;
+            background: #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+        
+        .document-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .document-info-table {
+                overflow-x: auto;
+            }
+            
+            .document-info-table table {
+                min-width: 500px;
+            }
+            
+            .document-title {
+                font-size: 24px;
+            }
+            
+            .document-card-header,
+            .document-card-body {
+                padding: 20px;
+            }
+            
+            .document-card-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-primary,
+            .btn-secondary {
+                justify-content: center;
+            }
+        }
+        
+        /* Loading animation */
         .loading-skeleton {
             animation: pulse 1.5s ease-in-out infinite;
         }
+        
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
+        }
+        
+        /* Icon styles */
+        .icon {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
     
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        SJC
-                    </div>
-                    <span class="font-bold text-xl text-gray-800">SJC Grove</span>
-                </div>
-                
-                <!-- Back Button -->
-                <button onclick="goBack()" class="flex items-center space-x-2 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    <span>Back to Documents</span>
-                </button>
-                
-                <!-- User Info -->
-                <div class="flex items-center space-x-4">
-                    <span class="hidden sm:block text-gray-600 font-medium">Hello, Student</span>
-                    <button class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium">
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="container">
         
-        <!-- Loading State -->
-        <div id="loading-state" class="text-center py-12">
-            <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p class="text-gray-600">Loading document...</p>
-        </div>
-
-        <!-- Error State -->
-        <div id="error-state" class="hidden text-center py-12">
-            <div class="bg-red-50 border border-red-200 rounded-lg p-8 max-w-md mx-auto">
-                <svg class="mx-auto h-12 w-12 text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                </svg>
-                <h3 class="text-lg font-semibold text-red-800 mb-2">Document Not Found</h3>
-                <p class="text-red-600 mb-4">The requested document could not be found.</p>
-                <button onclick="goBack()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
-                    Back to Documents
-                </button>
+        <!-- Header Section -->
+        <div class="header-section">
+            <!-- Logo -->
+            <div class="logo-container">
+                <div class="logo">
+                    <div class="logo-icon">SJC</div>
+                    <span class="logo-text">Stucon</span>
+                </div>
             </div>
-        </div>
-
-        <!-- Document Content -->
-        <div id="document-content" class="hidden">
             
-            <!-- Document Header -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-                    <div class="flex-1">
-                        <h1 id="doc-title" class="text-3xl font-bold text-gray-900 mb-3">Document Title</h1>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                            <div>
-                                <span class="text-gray-500">Scheme:</span>
-                                <span id="doc-scheme" class="font-medium text-gray-800 ml-1">-</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500">Branch:</span>
-                                <span id="doc-branch" class="font-medium text-gray-800 ml-1">-</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500">Semester:</span>
-                                <span id="doc-semester" class="font-medium text-gray-800 ml-1">-</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-500">Year:</span>
-                                <span id="doc-year" class="font-medium text-gray-800 ml-1">-</span>
-                            </div>
-                        </div>
-                        <div class="mt-2">
-                            <span class="text-gray-500 text-sm">Publisher:</span>
-                            <span id="doc-publisher" class="font-medium text-gray-700 ml-1">-</span>
-                        </div>
+            <!-- Back Button (positioned below logo) -->
+            <a href="#" class="back-button" onclick="goBack()">
+                <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Documents
+            </a>
+        </div>
+        
+        <!-- Document Information Table -->
+        <div class="document-info-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Scheme</th>
+                        <th>Branch</th>
+                        <th>Semester</th>
+                        <th>Subject</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="table-scheme">2024 Scheme</td>
+                        <td id="table-branch">Computer Science Engineering</td>
+                        <td id="table-semester">4th Semester</td>
+                        <td id="table-subject">Database Management Systems</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Document Card -->
+        <div class="document-card">
+            
+            <!-- Card Header -->
+            <div class="document-card-header">
+                <h1 class="document-title" id="document-title">
+                    Database Management Systems - Complete Guide
+                </h1>
+            </div>
+            
+            <!-- Card Body -->
+            <div class="document-card-body">
+                
+                <!-- Document Content Area -->
+                <div class="document-content">
+                    <div class="document-icon">📄</div>
+                    <div class="content-placeholder">
+                        <p><strong>Document Preview</strong></p>
+                        <p>Your document content will appear here</p>
+                        <p style="margin-top: 16px; font-size: 14px;">
+                            This could be a PDF viewer, text content, or any other document format
+                        </p>
                     </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="flex items-center space-x-4">
-                        <!-- Like/Dislike Buttons -->
-                        <div class="flex items-center space-x-2">
-                            <button id="like-btn" class="like-btn flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-green-100 text-gray-700 rounded-lg border transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V8a2 2 0 00-2-2h-3.17a2 2 0 01-1.97-2.36L8.78 1.292a1 1 0 011.903.44L10 5V8m4 2v10"></path>
-                                </svg>
-                                <span>Like</span>
-                                <span id="like-count" class="text-xs bg-white px-2 py-1 rounded-full">0</span>
-                            </button>
-                            
-                            <button id="dislike-btn" class="dislike-btn flex items-center space-x-2 px-4 py-2 bg-gray-100 hover:bg-red-100 text-gray-700 rounded-lg border transition-all">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018c.163 0 .326.02.485.06L17 4m-7 10v2a2 2 0 002 2h3.17a2 2 0 001.97 2.36l.748 2.708a1 1 0 01-1.903.44L14 19v-3m-4-2v-10"></path>
-                                </svg>
-                                <span>Dislike</span>
-                                <span id="dislike-count" class="text-xs bg-white px-2 py-1 rounded-full">0</span>
-                            </button>
-                        </div>
+                </div>
+                
+                <!-- Card Footer -->
+                <div class="document-card-footer">
+                    <div class="action-buttons">
+                        <a href="#" class="btn-primary" id="view-btn">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                            View Document
+                        </a>
                         
-                        <!-- Download Button -->
-                        <button id="download-btn" class="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <a href="#" class="btn-secondary" id="download-btn">
+                            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
                             </svg>
-                            <span>Download PDF</span>
-                        </button>
+                            Download PDF
+                        </a>
                     </div>
                 </div>
-            </div>
-
-            <!-- PDF Viewer -->
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4">Document Preview</h2>
-                <div class="pdf-container bg-gray-100 rounded-lg overflow-hidden">
-                    <iframe 
-                        id="pdf-viewer" 
-                        class="w-full h-full border-0 rounded-lg" 
-                        style="min-height: 600px;"
-                        title="PDF Document Viewer">
-                    </iframe>
-                </div>
-                <p class="text-sm text-gray-500 mt-2">
-                    If the PDF doesn't load properly, you can 
-                    <a id="fallback-link" href="#" target="_blank" class="text-blue-600 hover:text-blue-800 underline">click here to open it in a new tab</a>.
-                </p>
+                
             </div>
         </div>
-    </main>
-
-    <script src="titlePage.js"></script>
+    </div>
+    
+    <!-- JavaScript -->
+    <script>
+        // Go back function
+        function goBack() {
+            window.history.back();
+            // Fallback if history is empty
+            setTimeout(() => {
+                window.location.href = '../mainPage/mainPage.html';
+            }, 100);
+        }
+        
+        // Sample data loading (you can replace with your actual data)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 Document viewer initialized with new layout');
+            
+            // You can populate the data from your existing JavaScript
+            // Example of how to update the content:
+            /*
+            document.getElementById('table-scheme').textContent = '2024 Scheme';
+            document.getElementById('table-branch').textContent = 'Computer Science';
+            document.getElementById('table-semester').textContent = '4th Semester';
+            document.getElementById('table-subject').textContent = 'DBMS';
+            document.getElementById('document-title').textContent = 'Your Document Title';
+            */
+        });
+        
+        // Make goBack function globally available
+        window.goBack = goBack;
+    </script>
+    
 </body>
 </html>
