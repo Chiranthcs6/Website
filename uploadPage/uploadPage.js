@@ -1,5 +1,199 @@
 // =============================================================================
-// API INTEGRATION FOR DYNAMIC DROPDOWNS
+// ✅ USER AUTHENTICATION & SESSION MANAGEMENT (Same as mainPage)
+// =============================================================================
+
+let currentUser = null;
+
+// Check if user has valid session using companion cookie
+function hasAuthCookie() {
+    const cookies = document.cookie.split('; ');
+    for (const cookie of cookies) {
+        const [name, value] = cookie.split('=');
+        if (name === 'is_authenticated' && value === 'true') {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Validate session with backend
+async function validateSession() {
+    try {
+        console.log('🔍 Validating session with backend...');
+        
+        const response = await fetch('/api/auth/validate', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.valid) {
+                currentUser = data.user;
+                console.log('✅ Session valid:', currentUser);
+                return true;
+            }
+        }
+        
+        console.log('❌ Session invalid or expired');
+        return false;
+    } catch (error) {
+        console.error('❌ Session validation error:', error);
+        return false;
+    }
+}
+
+// ✅ Update user display dynamically
+function updateUserDisplay() {
+    if (!currentUser) return;
+    
+    const usernameElement = document.getElementById('username-display');
+    const userAvatarElement = document.getElementById('user-avatar');
+    const userDisplayElement = document.getElementById('user-display');
+    
+    if (usernameElement) {
+        usernameElement.textContent = currentUser.username;
+    }
+    
+    if (userAvatarElement) {
+        const initials = currentUser.username.substring(0, 2).toUpperCase();
+        userAvatarElement.textContent = initials;
+    }
+    
+    if (userDisplayElement) {
+        userDisplayElement.textContent = `Hello, ${currentUser.username}`;
+    }
+    
+    console.log(`✅ User display updated: ${currentUser.username} (${currentUser.email})`);
+}
+
+// Redirect to login page
+function redirectToLogin(message = 'Please log in to access this page.') {
+    console.log('🔒 Redirecting to login page:', message);
+    alert(message);
+    window.location.href = '../loginPage/loginPage.html';
+}
+
+// Check authentication and redirect if necessary
+async function checkAuthenticationAndRedirect() {
+    // Quick check using companion cookie
+    if (!hasAuthCookie()) {
+        redirectToLogin('Session expired or not logged in.');
+        return false;
+    }
+    
+    // Validate with backend
+    const isValid = await validateSession();
+    if (!isValid) {
+        redirectToLogin('Session expired. Please log in again.');
+        return false;
+    }
+    
+    return true;
+}
+
+// =============================================================================
+// ✅ LOGOUT FUNCTIONALITY (Same as mainPage)
+// =============================================================================
+
+async function handleLogout() {
+    try {
+        console.log('🔓 Initiating logout...');
+        
+        const logoutBtn = document.querySelector('.bg-red-500');
+        if (logoutBtn) {
+            const originalText = logoutBtn.innerHTML;
+            logoutBtn.disabled = true;
+            logoutBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging out...
+            `;
+            
+            // Call logout API
+            const apiResponse = await fetch('/api/users/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (apiResponse.ok) {
+                console.log('✅ Logout successful');
+                alert('Logout successful! You will be redirected to the login page.');
+                window.location.href = '../loginPage/loginPage.html';
+            } else {
+                const errorData = await apiResponse.json().catch(() => ({}));
+                const errorMessage = errorData.error || 'Logout failed';
+                
+                console.error('❌ Logout failed:', errorMessage);
+                alert(`Logout failed: ${errorMessage}`);
+                
+                logoutBtn.disabled = false;
+                logoutBtn.innerHTML = originalText;
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Network error during logout:', error);
+        alert('Network error during logout. Please try again.');
+        
+        const logoutBtn = document.querySelector('.bg-red-500');
+        if (logoutBtn) {
+            logoutBtn.disabled = false;
+            logoutBtn.innerHTML = 'Logout';
+        }
+    }
+}
+
+// =============================================================================
+// ✅ PERIODIC SESSION CHECK (Same as mainPage)
+// =============================================================================
+
+// Check session validity every 10 minutes
+function startSessionMonitoring() {
+    setInterval(async () => {
+        console.log('🔍 Periodic session check...');
+        
+        if (!hasAuthCookie()) {
+            redirectToLogin('Session expired during usage.');
+            return;
+        }
+        
+        const isValid = await validateSession();
+        if (!isValid) {
+            redirectToLogin('Session expired. Please log in again.');
+        }
+    }, 10 * 60 * 1000); // 10 minutes
+}
+
+// =============================================================================
+// ✅ INITIALIZE LOGOUT BUTTON
+// =============================================================================
+
+function initializeLogoutButton() {
+    const logoutButton = document.querySelector('.bg-red-500');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            
+            const confirmLogout = confirm('Are you sure you want to logout?');
+            if (confirmLogout) {
+                await handleLogout();
+            }
+        });
+        console.log('✅ Logout button handler attached');
+    }
+}
+
+// =============================================================================
+// ✅ API INTEGRATION FOR DYNAMIC DROPDOWNS
 // =============================================================================
 
 // API Cache to avoid repeated calls
@@ -9,7 +203,7 @@ const apiCache = {
     subjects: {}
 };
 
-// Form state with IDs for API calls
+// Form state with IDs for API calls and title field
 const formData = {
     title: '',
     description: '',
@@ -21,7 +215,7 @@ const formData = {
     subject: '',
     subjectID: '',
     file: null,
-    fileType: 'pdf' // Default for PDF files
+    fileType: 'pdf'
 };
 
 // Validation rules
@@ -36,10 +230,10 @@ const validationRules = {
 };
 
 // =============================================================================
-// API FUNCTIONS
+// API FUNCTIONS FOR PROPER CLASSIFICATION
 // =============================================================================
 
-// ✅ Fetch schemas from API
+// Fetch schemas from API
 async function fetchSchemas() {
     try {
         console.log('🔍 Fetching schemas from API...');
@@ -66,7 +260,7 @@ async function fetchSchemas() {
     }
 }
 
-// ✅ Fetch branches from API
+// Fetch branches from API
 async function fetchBranches() {
     try {
         console.log('🔍 Fetching branches from API...');
@@ -93,12 +287,11 @@ async function fetchBranches() {
     }
 }
 
-// ✅ Fetch subjects from API
+// Fetch subjects from API
 async function fetchSubjects(branchID, semester) {
     try {
         const cacheKey = `${branchID}_${semester}`;
         
-        // Check cache first
         if (apiCache.subjects[cacheKey]) {
             console.log('📋 Using cached subjects for:', cacheKey);
             return apiCache.subjects[cacheKey];
@@ -118,9 +311,7 @@ async function fetchSubjects(branchID, semester) {
             const data = await response.json();
             const subjects = data.SubjectArr || [];
             
-            // Cache the result
             apiCache.subjects[cacheKey] = subjects;
-            
             console.log('✅ Subjects fetched:', subjects);
             return subjects;
         } else {
@@ -132,8 +323,14 @@ async function fetchSubjects(branchID, semester) {
     }
 }
 
-// ✅ Get user ID from cookies
+// ✅ Enhanced user ID retrieval (consistent with session management)
 function getUserIdFromCookie() {
+    // First try to get from currentUser (from session validation)
+    if (currentUser && currentUser.id) {
+        return currentUser.id;
+    }
+    
+    // Fallback to cookie parsing
     const cookies = document.cookie.split('; ');
     for (const cookie of cookies) {
         const [name, value] = cookie.split('=');
@@ -148,16 +345,13 @@ function getUserIdFromCookie() {
 // DROPDOWN POPULATION FUNCTIONS
 // =============================================================================
 
-// ✅ Populate schema dropdown
+// Populate schema dropdown
 async function populateSchemaDropdown() {
     const schemaDropdown = document.querySelector('[data-field="schema"]').parentNode.querySelector('.dropdown-menu');
     const schemaButton = document.querySelector('[data-field="schema"]');
     const selectedText = schemaButton.querySelector('.selected-text');
     
-    // Show loading
     selectedText.textContent = 'Loading schemas...';
-    selectedText.classList.remove('text-gray-500');
-    selectedText.classList.add('text-gray-400');
     
     const schemas = await fetchSchemas();
     
@@ -167,15 +361,12 @@ async function populateSchemaDropdown() {
         return;
     }
     
-    // Build dropdown HTML
     let html = '';
     schemas.forEach(schema => {
         html += `<div class="dropdown-item" data-value="${schema}" data-id="${schema}">${schema}</div>`;
     });
     
     schemaDropdown.innerHTML = html;
-    
-    // Enable schema button
     schemaButton.disabled = false;
     selectedText.textContent = 'Select Schema';
     selectedText.classList.remove('text-gray-400');
@@ -184,13 +375,12 @@ async function populateSchemaDropdown() {
     console.log('✅ Schema dropdown populated with', schemas.length, 'schemas');
 }
 
-// ✅ Populate branch dropdown
+// Populate branch dropdown
 async function populateBranchDropdown() {
     const branchDropdown = document.querySelector('[data-field="branch"]').parentNode.querySelector('.dropdown-menu');
     const branchButton = document.querySelector('[data-field="branch"]');
     const selectedText = branchButton.querySelector('.selected-text');
     
-    // Show loading
     selectedText.textContent = 'Loading branches...';
     
     const branches = await fetchBranches();
@@ -201,15 +391,12 @@ async function populateBranchDropdown() {
         return;
     }
     
-    // Build dropdown HTML
     let html = '';
     branches.forEach(branch => {
         html += `<div class="dropdown-item" data-value="${branch.branchName}" data-id="${branch.branchID}">${branch.branchName}</div>`;
     });
     
     branchDropdown.innerHTML = html;
-    
-    // Enable branch button
     branchButton.disabled = false;
     selectedText.textContent = 'Select Branch';
     selectedText.classList.remove('text-gray-400');
@@ -218,7 +405,7 @@ async function populateBranchDropdown() {
     console.log('✅ Branch dropdown populated with', branches.length, 'branches');
 }
 
-// ✅ Populate semester dropdown (static semesters 1-8)
+// Populate semester dropdown (static 1-8)
 function populateSemesterDropdown() {
     const semesterDropdown = document.querySelector('[data-field="semester"]').parentNode.querySelector('.dropdown-menu');
     const semesterButton = document.querySelector('[data-field="semester"]');
@@ -238,7 +425,7 @@ function populateSemesterDropdown() {
     console.log('✅ Semester dropdown populated');
 }
 
-// ✅ Populate subject dropdown
+// Populate subject dropdown
 async function populateSubjectDropdown() {
     const subjectDropdown = document.querySelector('[data-field="subject"]').parentNode.querySelector('.dropdown-menu');
     const subjectButton = document.querySelector('[data-field="subject"]');
@@ -253,7 +440,6 @@ async function populateSubjectDropdown() {
         return;
     }
     
-    // Show loading
     selectedText.textContent = 'Loading subjects...';
     
     const subjects = await fetchSubjects(formData.branchID, formData.semester);
@@ -265,7 +451,6 @@ async function populateSubjectDropdown() {
         return;
     }
     
-    // Build dropdown HTML
     let html = '';
     subjects.forEach(subject => {
         html += `<div class="dropdown-item" data-value="${subject.subjectName}" data-id="${subject.subjectID}">${subject.subjectName}</div>`;
@@ -281,7 +466,7 @@ async function populateSubjectDropdown() {
 }
 
 // =============================================================================
-// DROPDOWN FUNCTIONALITY
+// DROPDOWN FUNCTIONALITY WITH PROPER EVENT HANDLING
 // =============================================================================
 
 function initializeDropdowns() {
@@ -302,7 +487,6 @@ function initializeDropdowns() {
             document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
             document.querySelectorAll('.dropdown-button').forEach(b => b.classList.remove('active'));
             
-            // Open current dropdown
             if (!isOpen) {
                 menu.classList.add('show');
                 button.classList.add('active');
@@ -333,12 +517,10 @@ function initializeDropdowns() {
                 formData.schemaID = id;
             } else if (field === 'branch') {
                 formData.branchID = id;
-                // Reset dependent dropdowns
                 resetSubjectDropdown();
                 formData.subject = '';
                 formData.subjectID = '';
             } else if (field === 'semester') {
-                // Reset subject dropdown
                 resetSubjectDropdown();
                 formData.subject = '';
                 formData.subjectID = '';
@@ -346,17 +528,13 @@ function initializeDropdowns() {
                 formData.subjectID = id;
             }
             
-            // Clear validation error
             const formField = button.closest('.form-field');
             formField.classList.remove('error');
             
-            // Close dropdown
             menu.classList.remove('show');
             button.classList.remove('active');
             
-            // Handle cascading updates
             handleDropdownChange(field, value, id);
-            
             console.log(`${field} selected:`, value, '(ID:', id, ')');
         }
     });
@@ -371,7 +549,6 @@ function initializeDropdowns() {
 }
 
 function handleDropdownChange(field, value, id) {
-    // Handle cascading updates
     if (field === 'schema') {
         populateBranchDropdown();
         populateSemesterDropdown();
@@ -407,13 +584,11 @@ function initializeFileUpload() {
     const fileSizeSpan = document.getElementById('file-size');
     const removeFileBtn = document.getElementById('remove-file');
     
-    // Handle click to upload
     fileUploadArea.addEventListener('click', () => {
         if (!selectedFileDiv.classList.contains('hidden')) return;
         fileInput.click();
     });
     
-    // Handle drag and drop
     fileUploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
         fileUploadArea.classList.add('dragover');
@@ -434,43 +609,37 @@ function initializeFileUpload() {
         }
     });
     
-    // Handle file input change
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             handleFileSelection(e.target.files[0]);
         }
     });
     
-    // Handle file removal
     removeFileBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         removeSelectedFile();
     });
     
     function handleFileSelection(file) {
-        // Validate file type
         if (file.type !== 'application/pdf') {
             showMessage('error', 'Please select a PDF file only.');
             return;
         }
         
-        // Validate file size (50MB limit)
-        const maxSize = 50 * 1024 * 1024; // 50MB in bytes
+        const maxSize = 50 * 1024 * 1024;
         if (file.size > maxSize) {
             showMessage('error', 'File size must be less than 50MB.');
             return;
         }
         
-        // Update UI
         formData.file = file;
-        formData.fileType = 'pdf'; // Set file type
+        formData.fileType = 'pdf';
         fileNameSpan.textContent = file.name;
         fileSizeSpan.textContent = formatFileSize(file.size);
         
         uploadContent.classList.add('hidden');
         selectedFileDiv.classList.remove('hidden');
         
-        // Clear validation error
         const formField = fileUploadArea.closest('.form-field');
         formField.classList.remove('error');
         
@@ -507,7 +676,6 @@ function validateForm() {
     let isValid = true;
     const errors = {};
     
-    // Validate each field
     Object.keys(validationRules).forEach(field => {
         const rule = validationRules[field];
         const value = formData[field];
@@ -518,19 +686,15 @@ function validateForm() {
         }
     });
     
-    // Update UI with validation errors
     updateValidationUI(errors);
-    
     return isValid;
 }
 
 function updateValidationUI(errors) {
-    // Clear all existing errors
     document.querySelectorAll('.form-field').forEach(field => {
         field.classList.remove('error');
     });
     
-    // Show new errors
     Object.keys(errors).forEach(field => {
         const formField = getFormField(field);
         if (formField) {
@@ -556,7 +720,7 @@ function getFormField(field) {
 }
 
 // =============================================================================
-// FORM SUBMISSION WITH API INTEGRATION
+// FORM SUBMISSION WITH PROPER API INTEGRATION
 // =============================================================================
 
 function initializeFormSubmission() {
@@ -571,7 +735,6 @@ function initializeFormSubmission() {
     titleInput.addEventListener('input', (e) => {
         formData.title = e.target.value.trim();
         
-        // Clear validation error
         const formField = e.target.closest('.form-field');
         if (formData.title) {
             formField.classList.remove('error');
@@ -582,7 +745,6 @@ function initializeFormSubmission() {
     descriptionTextarea.addEventListener('input', (e) => {
         formData.description = e.target.value.trim();
         
-        // Clear validation error
         const formField = e.target.closest('.form-field');
         if (formData.description) {
             formField.classList.remove('error');
@@ -593,29 +755,25 @@ function initializeFormSubmission() {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Hide any existing messages
         hideMessages();
         
-        // Validate form
         if (!validateForm()) {
             showMessage('error', 'Please fill in all required fields correctly.');
             return;
         }
         
-        // Get user ID from cookies
         const userId = getUserIdFromCookie();
         if (!userId) {
             showMessage('error', 'User authentication required. Please log in again.');
             return;
         }
         
-        // Disable submit button and show loading
         submitBtn.disabled = true;
         submitText.classList.add('hidden');
         loadingDiv.classList.add('show');
         
         try {
-            // ✅ Prepare FormData for API upload
+            // Prepare FormData with correct API parameters
             const uploadFormData = new FormData();
             uploadFormData.append('user_id', userId);
             uploadFormData.append('schema_id', formData.schemaID);
@@ -638,10 +796,10 @@ function initializeFormSubmission() {
                 fileSize: formData.file.size
             });
             
-            // ✅ Submit to backend API
+            // Submit to correct API endpoint
             const response = await fetch('/api/upload', {
                 method: 'POST',
-                credentials: 'include', // Include cookies for authentication
+                credentials: 'include',
                 body: uploadFormData
             });
             
@@ -651,7 +809,6 @@ function initializeFormSubmission() {
                 
                 showMessage('success', 'Document uploaded successfully! Thank you for contributing to Stucon.');
                 
-                // Reset form after successful upload
                 setTimeout(() => {
                     resetForm();
                 }, 3000);
@@ -666,7 +823,6 @@ function initializeFormSubmission() {
             console.error('❌ Network error during upload:', error);
             showMessage('error', 'Network error. Please check your connection and try again.');
         } finally {
-            // Re-enable submit button and hide loading
             submitBtn.disabled = false;
             submitText.classList.remove('hidden');
             loadingDiv.classList.remove('show');
@@ -675,7 +831,6 @@ function initializeFormSubmission() {
 }
 
 function resetForm() {
-    // Reset form data
     Object.keys(formData).forEach(key => {
         if (key === 'file') {
             formData[key] = null;
@@ -686,11 +841,9 @@ function resetForm() {
         }
     });
     
-    // Reset input fields
     document.getElementById('title').value = '';
     document.getElementById('description').value = '';
     
-    // Reset dropdowns
     document.querySelectorAll('.dropdown-button .selected-text').forEach(text => {
         const button = text.closest('.dropdown-button');
         const field = button.getAttribute('data-field');
@@ -706,12 +859,10 @@ function resetForm() {
         text.classList.add(field === 'schema' ? 'text-gray-500' : 'text-gray-400');
     });
     
-    // Reset file upload
     document.getElementById('file-input').value = '';
     document.querySelector('.upload-content').classList.remove('hidden');
     document.querySelector('.selected-file').classList.add('hidden');
     
-    // Clear validation errors
     document.querySelectorAll('.form-field').forEach(field => {
         field.classList.remove('error');
     });
@@ -720,7 +871,7 @@ function resetForm() {
 }
 
 // =============================================================================
-// MESSAGE HANDLING
+// MESSAGE HANDLING & NAVIGATION
 // =============================================================================
 
 function showMessage(type, text) {
@@ -735,7 +886,6 @@ function showMessage(type, text) {
     textSpan.textContent = text;
     messageDiv.classList.add('show');
     
-    // Auto-hide success messages after 5 seconds
     if (type === 'success') {
         setTimeout(() => {
             hideMessages();
@@ -748,38 +898,47 @@ function hideMessages() {
     document.getElementById('error-message').classList.remove('show');
 }
 
-// =============================================================================
-// NAVIGATION
-// =============================================================================
-
 function goBack() {
     window.history.back();
     
-    // Fallback if history is empty
     setTimeout(() => {
         window.location.href = '../mainPage/mainPage.html';
     }, 100);
 }
 
-// Make goBack function globally available
 window.goBack = goBack;
 
 // =============================================================================
-// INITIALIZATION
+// ✅ INITIALIZATION WITH AUTHENTICATION INTEGRATION
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('📤 Upload page initialized with API integration');
+    console.log('📤 Upload page initialized with authentication');
     
-    // Initialize all components
+    // ✅ Check authentication first (same as mainPage)
+    const isAuthenticated = await checkAuthenticationAndRedirect();
+    if (!isAuthenticated) {
+        return; // Stop execution if not authenticated
+    }
+    
+    // ✅ Update user display (same as mainPage)
+    updateUserDisplay();
+    
+    // ✅ Start session monitoring (same as mainPage)
+    startSessionMonitoring();
+    
+    // ✅ Initialize logout button (same as mainPage)
+    initializeLogoutButton();
+    
+    // Initialize existing components
     initializeDropdowns();
     initializeFileUpload();
     initializeFormSubmission();
     
-    // ✅ Initialize API-driven dropdowns
+    // Initialize API-driven dropdowns
     await populateSchemaDropdown();
     
-    console.log('✅ Upload page ready with API integration');
+    console.log('✅ Upload page ready with authentication and user info');
 });
 
-console.log('✅ Stucon Upload Page - Ready with API integration!');
+console.log('✅ Stucon Upload Page - Ready with authentication integration!');
