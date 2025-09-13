@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 credentials: 'include', // Important for cookie-based auth
                 body: JSON.stringify({
                     email: email,
-                    passwordHash: password
+                    password: password
                 })
             });
             // ============================================================
