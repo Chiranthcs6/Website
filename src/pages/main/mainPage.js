@@ -3,6 +3,15 @@
 // =============================================================================
 
 let currentUser = null;
+let allDocuments = [];
+
+// Current filter state
+const filters = {
+    scheme: "All",
+    branch: "All",
+    semester: "All", 
+    subject: "All"
+};
 
 // Helper: read cookie
 function getCookie(name) {
@@ -17,15 +26,13 @@ function hasAuthCookie() {
     return getCookie('is_logged_in') === 'true';
 }
 
-// ✅ FIXED: Validate session with backend (status-based)
+// Validate session with backend
 async function validateSession() {
     try {
         console.log('🔍 Validating session with backend...');
-
         const email = getCookie('user_email');
         const token = getCookie('session_token');
-        console.log("Logging Email and Token:", email, token);
-
+        
         if (!email || !token) {
             console.log('❌ Missing email or token in cookies');
             return false;
@@ -34,12 +41,12 @@ async function validateSession() {
         const response = await fetch('/api/user/validate', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ "email":email, "token":token })
+            body: JSON.stringify({ "email": email, "token": token })
         });
 
         if (response.status === 200) {
             console.log('✅ Session valid');
-            currentUser = { email: email, username: email.split('@')[0] }; // simple fallback
+            currentUser = { email: email, username: email.split('@')[0] };
             return true;
         } else {
             console.log('❌ Session invalid or expired');
@@ -54,7 +61,7 @@ async function validateSession() {
 // Update user display
 function updateUserDisplay() {
     if (!currentUser) return;
-
+    
     const usernameElement = document.getElementById('username-display');
     const userAvatarElement = document.getElementById('user-avatar');
 
@@ -68,16 +75,12 @@ function updateUserDisplay() {
             .toUpperCase();
         userAvatarElement.textContent = initials;
     }
-
-    console.log(`✅ User display updated: ${currentUser.username} (${currentUser.email})`);
 }
-
 
 // Redirect to login page
 function redirectToLogin(message = 'Please log in to access this page.') {
-    console.log('🔒 Redirecting to login page:', message);
-    //alert(message);
-    //window.location.href = '../login/loginPage.html';
+    // console.log('🔒 Redirecting to login page:', message);
+    // window.location.href = '../login/loginPage.html';
 }
 
 // Check authentication and redirect if necessary
@@ -97,476 +100,272 @@ async function checkAuthenticationAndRedirect() {
 }
 
 // =============================================================================
-// LOGOUT FUNCTIONALITY
+// DOCUMENT MANAGEMENT
 // =============================================================================
 
-async function handleLogout() {
+// Fetch documents from backend or use sample data
+async function fetchDocuments() {
     try {
-        console.log('🔓 Initiating logout...');
+        console.log('📋 Fetching documents...');
         
-        const logoutBtn = document.querySelector('.bg-red-500');
-        if (logoutBtn) {
-            const originalText = logoutBtn.innerHTML;
-            logoutBtn.disabled = true;
-            logoutBtn.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Logging out...
-            `;
-            
-            const apiResponse = await fetch('/api/user/logout', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-            
-            if (apiResponse.ok) {
-                console.log('✅ Logout successful');
-                alert('Logout successful! You will be redirected to the login page.');
-                window.location.href = '../login/loginPage.html';
-            } else {
-                const errorData = await apiResponse.json().catch(() => ({}));
-                const errorMessage = errorData.error || 'Logout failed';
-                
-                console.error('❌ Logout failed:', errorMessage);
-                alert(`Logout failed: ${errorMessage}`);
-                
-                logoutBtn.disabled = false;
-                logoutBtn.innerHTML = originalText;
-            }
-        }
-        
-    } catch (error) {
-        console.error('❌ Network error during logout:', error);
-        alert('Network error during logout. Please try again.');
-        
-        const logoutBtn = document.querySelector('.bg-red-500');
-        if (logoutBtn) {
-            logoutBtn.disabled = false;
-            logoutBtn.innerHTML = 'Logout';
-        }
-    }
-}
-
-// =============================================================================
-// PERIODIC SESSION CHECK
-// =============================================================================
-
-function startSessionMonitoring() {
-    setInterval(async () => {
-        console.log('🔍 Periodic session check...');
-        
-        if (!hasAuthCookie()) {
-            redirectToLogin('Session expired during usage.');
-            return;
-        }
-        
-        const isValid = await validateSession();
-        if (!isValid) {
-            redirectToLogin('Session expired. Please log in again.');
-        }
-    }, 10 * 60 * 1000);
-}
-
-// =============================================================================
-// UPLOAD BUTTON FUNCTIONALITY
-// =============================================================================
-
-function handleUploadRedirect() {
-    console.log('📤 Redirecting to upload page...');
-    storeFilterValuesInSession();
-    window.location.href = '/src/pages/upload/uploadPage.html';
-}
-
-function initializeUploadButtons() {
-    const uploadBtn = document.getElementById('upload-btn');
-    if (uploadBtn) {
-        uploadBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            handleUploadRedirect();
-        });
-        console.log('✅ Desktop upload button handler attached');
-    }
-    
-    const uploadBtnMobile = document.getElementById('upload-btn-mobile');
-    if (uploadBtnMobile) {
-        uploadBtnMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            handleUploadRedirect();
-        });
-        console.log('✅ Mobile upload button handler attached');
-    }
-}
-
-// =============================================================================
-// API INTEGRATION FOR DYNAMIC DROPDOWNS
-// =============================================================================
-
-// API Cache to avoid repeated calls
-const apiCache = {
-    schemes: null,
-    branches: null,
-    subjects: {}
-};
-
-// Filter state with IDs for API calls
-const filters = {
-    scheme: "All",
-    schemeID: null,
-    branch: "All",
-    branchID: null,
-    semester: "All",
-    subject: "All",
-    subjectID: null
-};
-
-// ✅ NEW: Fetch schemes from API
-async function fetchSchemes() {
-    try {
-        console.log('🔍 Fetching schemes from API...');
-        
-        const response = await fetch('/api/explore/getscheme', {
+        const response = await fetch('/api/documents/all', {
             method: 'GET',
             credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
         
         if (response.ok) {
             const data = await response.json();
-            apiCache.schemes = data.strArr || [];
-            console.log('✅ Schemes fetched:', apiCache.schemes);
-            return apiCache.schemes;
+            allDocuments = data.documents || [];
+            console.log('✅ Documents fetched:', allDocuments.length);
         } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            throw new Error('API not available');
         }
     } catch (error) {
-        console.error('❌ Error fetching schemes:', error);
-        return [];
+        console.log('📋 Using sample documents for testing');
+        allDocuments = getSampleDocuments();
     }
 }
 
-// ✅ NEW: Fetch branches from API
-async function fetchBranches() {
-    try {
-        console.log('🔍 Fetching branches from API...');
-        
-        const response = await fetch('/api/explore/getbranch', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            apiCache.branches = data.BranchArr || [];
-            console.log('✅ Branches fetched:', apiCache.branches);
-            return apiCache.branches;
-        } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+// Sample documents for testing
+function getSampleDocuments() {
+    return [
+        {
+            id: 1,
+            title: "Mathematics Assignment 1",
+            scheme: "2022",
+            branch: "Computer Science",
+            semester: "3", 
+            subject: "Mathematics",
+            uploadDate: "2024-09-10",
+            fileType: "PDF"
+        },
+        {
+            id: 2,
+            title: "Physics Lab Manual",
+            scheme: "2022", 
+            branch: "Electronics",
+            semester: "2",
+            subject: "Physics",
+            uploadDate: "2024-09-09",
+            fileType: "PDF"
+        },
+        {
+            id: 3,
+            title: "Programming Notes",
+            scheme: "2020",
+            branch: "Computer Science", 
+            semester: "1",
+            subject: "Programming",
+            uploadDate: "2024-09-08", 
+            fileType: "DOC"
+        },
+        {
+            id: 4,
+            title: "Data Structures Tutorial",
+            scheme: "2022",
+            branch: "Computer Science",
+            semester: "4",
+            subject: "Data Structures", 
+            uploadDate: "2024-09-07",
+            fileType: "PDF"
+        },
+        {
+            id: 5,
+            title: "DBMS Lab Exercise",
+            scheme: "2020",
+            branch: "Computer Science",
+            semester: "5",
+            subject: "DBMS",
+            uploadDate: "2024-09-06", 
+            fileType: "PDF"
+        },
+        {
+            id: 6,
+            title: "Network Configuration Guide",
+            scheme: "2024",
+            branch: "Electronics", 
+            semester: "6",
+            subject: "Networks",
+            uploadDate: "2024-09-05",
+            fileType: "DOC"
         }
-    } catch (error) {
-        console.error('❌ Error fetching branches:', error);
-        return [];
-    }
+    ];
 }
 
-// ✅ NEW: Fetch subjects from API
-async function fetchSubjects(branchID, semester) {
-    try {
-        const cacheKey = `${branchID}_${semester}`;
-        
-        // Check cache first
-        if (apiCache.subjects[cacheKey]) {
-            console.log('📋 Using cached subjects for:', cacheKey);
-            return apiCache.subjects[cacheKey];
-        }
-        
-        console.log('🔍 Fetching subjects from API for branch:', branchID, 'semester:', semester);
-        
-        const response = await fetch(`/api/explore/getsub?branch_id=${encodeURIComponent(branchID)}&sem=${encodeURIComponent(semester)}`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            const subjects = data.SubjectArr || [];
-            
-            // Cache the result
-            apiCache.subjects[cacheKey] = subjects;
-            
-            console.log('✅ Subjects fetched:', subjects);
-            return subjects;
-        } else {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-    } catch (error) {
-        console.error('❌ Error fetching subjects:', error);
-        return [];
+// Filter documents based on current filter state
+function getFilteredDocuments() {
+    let filteredDocs = allDocuments;
+    
+    if (filters.scheme !== "All") {
+        filteredDocs = filteredDocs.filter(doc => doc.scheme === filters.scheme);
     }
+    
+    if (filters.branch !== "All") {
+        filteredDocs = filteredDocs.filter(doc => doc.branch === filters.branch);
+    }
+    
+    if (filters.semester !== "All") {
+        filteredDocs = filteredDocs.filter(doc => doc.semester === filters.semester);
+    }
+    
+    if (filters.subject !== "All") {
+        filteredDocs = filteredDocs.filter(doc => doc.subject === filters.subject);
+    }
+    
+    console.log(`📋 Filtered ${filteredDocs.length} documents from ${allDocuments.length} total`);
+    return filteredDocs;
 }
 
-// =============================================================================
-// DROPDOWN POPULATION FUNCTIONS
-// =============================================================================
-
-// ✅ NEW: Populate scheme dropdown
-async function populateSchemeDropdown() {
-    const schemeDropdown = document.getElementById('scheme-dropdown');
-    const schemeButton = document.querySelector('[data-filter="scheme"]');
-    
-    // Show loading
-    schemeDropdown.innerHTML = '<li class="disabled">Loading schemes...</li>';
-    
-    const schemes = await fetchSchemes();
-    
-    if (schemes.length === 0) {
-        schemeDropdown.innerHTML = '<li class="disabled">No schemes available</li>';
-        return;
-    }
-    
-    // Build dropdown HTML
-    let html = '<li data-value="All" data-id="" class="selected">All Schemes</li>';
-    schemes.forEach(scheme => {
-        html += `<li data-value="${scheme}" data-id="${scheme}">${scheme}</li>`;
-    });
-    
-    schemeDropdown.innerHTML = html;
-    
-    // Enable scheme button
-    schemeButton.disabled = false;
-    
-    console.log('✅ Scheme dropdown populated with', schemes.length, 'schemes');
-}
-
-// ✅ NEW: Populate branch dropdown
-async function populateBranchDropdown() {
-    const branchDropdown = document.getElementById('branch-dropdown');
-    const branchButton = document.querySelector('[data-filter="branch"]');
-    
-    // Show loading
-    branchDropdown.innerHTML = '<li class="disabled">Loading branches...</li>';
-    
-    const branches = await fetchBranches();
-    
-    if (branches.length === 0) {
-        branchDropdown.innerHTML = '<li class="disabled">No branches available</li>';
-        return;
-    }
-    
-    // Build dropdown HTML
-    let html = '<li data-value="All" data-id="" class="selected">All Branches</li>';
-    branches.forEach(branch => {
-        html += `<li data-value="${branch.branchName}" data-id="${branch.branchID}">${branch.branchName}</li>`;
-    });
-    
-    branchDropdown.innerHTML = html;
-    
-    // Enable branch button
-    branchButton.disabled = false;
-    
-    console.log('✅ Branch dropdown populated with', branches.length, 'branches');
-}
-
-// ✅ NEW: Populate semester dropdown (static semesters 1-8)
-function populateSemesterDropdown() {
-    const semesterDropdown = document.getElementById('semester-dropdown');
-    const semesterButton = document.querySelector('[data-filter="semester"]');
-    
-    let html = '<li data-value="All" data-id="" class="selected">All Semesters</li>';
-    for (let i = 1; i <= 8; i++) {
-        html += `<li data-value="${i}" data-id="${i}">Semester ${i}</li>`;
-    }
-    
-    semesterDropdown.innerHTML = html;
-    semesterButton.disabled = false;
-    
-    console.log('✅ Semester dropdown populated');
-}
-
-// ✅ NEW: Populate subject dropdown
-async function populateSubjectDropdown() {
-    const subjectDropdown = document.getElementById('subject-dropdown');
-    const subjectButton = document.querySelector('[data-filter="subject"]');
-    
-    if (!filters.branchID || !filters.semester || filters.semester === "All") {
-        subjectDropdown.innerHTML = '<li class="disabled">Select branch and semester first</li>';
-        subjectButton.disabled = true;
-        return;
-    }
-    
-    // Show loading
-    subjectDropdown.innerHTML = '<li class="disabled">Loading subjects...</li>';
-    
-    const subjects = await fetchSubjects(filters.branchID, filters.semester);
-    
-    if (subjects.length === 0) {
-        subjectDropdown.innerHTML = '<li class="disabled">No subjects available</li>';
-        subjectButton.disabled = true;
-        return;
-    }
-    
-    // Build dropdown HTML
-    let html = '<li data-value="All" data-id="" class="selected">All Subjects</li>';
-    subjects.forEach(subject => {
-        html += `<li data-value="${subject.subjectName}" data-id="${subject.subjectID}">${subject.subjectName}</li>`;
-    });
-    
-    subjectDropdown.innerHTML = html;
-    subjectButton.disabled = false;
-    
-    console.log('✅ Subject dropdown populated with', subjects.length, 'subjects');
-}
-
-// =============================================================================
-// DROPDOWN EVENT HANDLERS
-// =============================================================================
-
-// ✅ NEW: Handle dropdown selections with cascading updates
-function handleDropdownSelection(filterType, value, id, text) {
-    console.log(`Filter selected: ${filterType} = ${value} (ID: ${id})`);
-    
-    // Update filter state
-    filters[filterType] = value;
-    if (filterType === 'scheme') {
-        filters.schemeID = id;
-    } else if (filterType === 'branch') {
-        filters.branchID = id;
-        // Reset dependent dropdowns
-        resetSubjectDropdown();
-        filters.subject = "All";
-        filters.subjectID = null;
-    } else if (filterType === 'semester') {
-        // Reset subject dropdown
-        resetSubjectDropdown();
-        filters.subject = "All";
-        filters.subjectID = null;
-    } else if (filterType === 'subject') {
-        filters.subjectID = id;
-    }
-    
-    // Handle cascading updates
-    if (filterType === 'scheme' && value !== "All") {
-        populateBranchDropdown();
-        populateSemesterDropdown();
-    } else if (filterType === 'branch' && value !== "All") {
-        if (filters.semester !== "All") {
-            populateSubjectDropdown();
-        }
-    } else if (filterType === 'semester' && value !== "All") {
-        if (filters.branchID) {
-            populateSubjectDropdown();
-        }
-    }
-    
-    // Store filter values
-    storeFilterValuesInSession();
-    
-    // Update UI and render results
-    updateFilterIndicators();
-    renderDocuments();
-}
-
-// ✅ NEW: Reset subject dropdown
-function resetSubjectDropdown() {
-    const subjectDropdown = document.getElementById('subject-dropdown');
-    const subjectButton = document.querySelector('[data-filter="subject"]');
-    
-    subjectDropdown.innerHTML = '<li class="disabled">Select branch and semester first</li>';
-    subjectButton.disabled = true;
-    
-    // Update button text
-    subjectButton.textContent = 'Subject';
-    const indicator = subjectButton.querySelector('.filter-indicator');
-    if (indicator) subjectButton.appendChild(indicator);
-}
-
-// =============================================================================
-// DOCUMENT RENDERING (PLACEHOLDER)
-// =============================================================================
-
-// ✅ NEW: Render documents based on current filters
+// Render documents in the grid
 function renderDocuments() {
     const contentDiv = document.getElementById('content');
     const resultsTitle = document.getElementById('results-title');
+    const noResults = document.getElementById('no-results');
     
-    // For now, show placeholder - replace with actual document fetching
-    contentDiv.innerHTML = `
-        <div class="col-span-full text-center py-8">
-            <p class="text-gray-500 mb-4">Document fetching will be implemented here</p>
-            <p class="text-sm text-gray-400">Current filters: 
-                Scheme: ${filters.scheme || 'All'}, 
-                Branch: ${filters.branch || 'All'}, 
-                Semester: ${filters.semester || 'All'}, 
-                Subject: ${filters.subject || 'All'}
-            </p>
+    const filteredDocuments = getFilteredDocuments();
+    
+    if (filteredDocuments.length === 0) {
+        contentDiv.innerHTML = '';
+        noResults.classList.remove('hidden');
+        resultsTitle.textContent = 'No Documents Found';
+        return;
+    }
+    
+    noResults.classList.add('hidden');
+    resultsTitle.textContent = `Documents (${filteredDocuments.length})`;
+    
+    // Generate document cards
+    const cardsHTML = filteredDocuments.map(doc => `
+        <div class="card bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-2">${doc.title}</h3>
+                    <div class="space-y-1 text-sm text-gray-600">
+                        <p><span class="font-medium">Scheme:</span> ${doc.scheme}</p>
+                        <p><span class="font-medium">Branch:</span> ${doc.branch}</p>
+                        <p><span class="font-medium">Semester:</span> ${doc.semester}</p>
+                        <p><span class="font-medium">Subject:</span> ${doc.subject}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${doc.fileType === 'PDF' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'}">
+                        ${doc.fileType}
+                    </span>
+                    <p class="text-xs text-gray-500 mt-2">${doc.uploadDate}</p>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
+                    Download
+                </button>
+                <button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-md text-sm font-medium hover:bg-gray-50 transition-colors">
+                    Preview
+                </button>
+            </div>
         </div>
-    `;
+    `).join('');
     
-    resultsTitle.textContent = `Documents (Filtered)`;
+    contentDiv.innerHTML = cardsHTML;
     
-    console.log('📋 Current filter state:', filters);
+    console.log(`✅ Rendered ${filteredDocuments.length} document cards`);
 }
 
 // =============================================================================
-// UTILITY FUNCTIONS
+// DROPDOWN FUNCTIONALITY
 // =============================================================================
 
-function getCurrentFilterValues() {
-    return {
-        scheme: filters.scheme,
-        schemeID: filters.schemeID,
-        branch: filters.branch,
-        branchID: filters.branchID,
-        semester: filters.semester,
-        subject: filters.subject,
-        subjectID: filters.subjectID
-    };
+// Handle dropdown selection
+function handleDropdownSelection(filterType, value, buttonElement) {
+    console.log(`📋 Filter selected: ${filterType} = ${value}`);
+    
+    // Update filter state
+    filters[filterType] = value;
+    
+    // Update button text
+    const buttonText = value === 'All' ? 
+        filterType.charAt(0).toUpperCase() + filterType.slice(1) : 
+        (value.length > 15 ? value.substring(0, 15) + '...' : value);
+    
+    // Preserve the indicator
+    const indicator = buttonElement.querySelector('.filter-indicator');
+    buttonElement.textContent = buttonText;
+    if (indicator) {
+        buttonElement.appendChild(indicator);
+        
+        // Show/hide indicator based on selection
+        if (value !== 'All') {
+            indicator.classList.remove('hidden');
+        } else {
+            indicator.classList.add('hidden');
+        }
+    }
+    
+    // Re-render documents with new filters
+    renderDocuments();
+    
+    // Update filter count display
+    updateFilterCount();
+    
+    console.log('📋 Current filters:', filters);
 }
 
-function storeFilterValuesInSession() {
-    const filterValues = getCurrentFilterValues();
-    sessionStorage.setItem('documentFilters', JSON.stringify(filterValues));
-    console.log('Filter values stored in session:', filterValues);
+// Update filter count display
+function updateFilterCount() {
+    const filterCount = document.getElementById('filter-count');
+    const activeFilters = Object.values(filters).filter(v => v !== 'All').length;
+    
+    if (filterCount) {
+        filterCount.textContent = activeFilters > 0 ? 
+            `${activeFilters} filter${activeFilters > 1 ? 's' : ''} active` : '';
+    }
 }
 
-function updateFilterIndicators() {
+// Clear all filters
+function clearAllFilters() {
+    // Reset filter state
+    filters.scheme = "All";
+    filters.branch = "All";  
+    filters.semester = "All";
+    filters.subject = "All";
+    
+    // Reset button texts and indicators
     document.querySelectorAll('.nav-tab').forEach(tab => {
         const filterType = tab.getAttribute('data-filter');
         const indicator = tab.querySelector('.filter-indicator');
         
-        if (filters[filterType] !== "All") {
-            if (indicator) indicator.classList.remove('hidden');
-            tab.classList.add('active');
-        } else {
-            if (indicator) indicator.classList.add('hidden');
-            tab.classList.remove('active');
+        tab.textContent = filterType.charAt(0).toUpperCase() + filterType.slice(1);
+        if (indicator) {
+            tab.appendChild(indicator);
+            indicator.classList.add('hidden');
         }
     });
+    
+    // Reset dropdown selections
+    document.querySelectorAll('.dropdown li').forEach(li => {
+        li.classList.remove('selected');
+        if (li.getAttribute('data-value') === 'All') {
+            li.classList.add('selected');
+        }
+    });
+    
+    // Re-render documents and update count
+    renderDocuments();
+    updateFilterCount();
+    
+    console.log('🧹 All filters cleared');
 }
 
 // =============================================================================
-// EVENT HANDLERS
+// EVENT HANDLERS  
 // =============================================================================
 
+// Initialize dropdown event listeners
 function initializeDropdownHandlers() {
     // Dropdown button clicks
     document.querySelectorAll(".nav-tab").forEach(tab => {
         tab.addEventListener("click", (e) => {
             e.stopPropagation();
-            
-            if (tab.disabled) return;
             
             const dropdown = tab.nextElementSibling;
             const isOpen = dropdown.classList.contains("show");
@@ -583,22 +382,15 @@ function initializeDropdownHandlers() {
         });
     });
     
-    // Dropdown item clicks (using event delegation)
+    // Dropdown item clicks
     document.addEventListener('click', (e) => {
-        if (e.target.tagName === 'LI' && e.target.hasAttribute('data-value') && !e.target.classList.contains('disabled')) {
+        if (e.target.tagName === 'LI' && e.target.hasAttribute('data-value')) {
             e.stopPropagation();
             
             const dropdown = e.target.closest('.dropdown');
             const button = dropdown.previousElementSibling;
             const filterType = dropdown.getAttribute('data-filter');
             const value = e.target.getAttribute('data-value');
-            const id = e.target.getAttribute('data-id');
-            const text = e.target.textContent;
-            
-            // Update button text
-            const indicator = button.querySelector('.filter-indicator');
-            button.textContent = value === 'All' ? filterType.charAt(0).toUpperCase() + filterType.slice(1) : text;
-            if (indicator) button.appendChild(indicator);
             
             // Update selected state
             dropdown.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
@@ -609,7 +401,7 @@ function initializeDropdownHandlers() {
             button.classList.remove('active');
             
             // Handle the selection
-            handleDropdownSelection(filterType, value, id, text);
+            handleDropdownSelection(filterType, value, button);
         }
     });
     
@@ -622,54 +414,66 @@ function initializeDropdownHandlers() {
     });
 }
 
-// Clear filters functionality
-function initializeClearFilters() {
-    const clearBtn = document.getElementById('clearFilters');
-    if (clearBtn) {
-        clearBtn.addEventListener('click', async () => {
-            // Reset all filters
-            filters.scheme = "All";
-            filters.schemeID = null;
-            filters.branch = "All";
-            filters.branchID = null;
-            filters.semester = "All";
-            filters.subject = "All";
-            filters.subjectID = null;
-            
-            // Reset all dropdown texts
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                const filterType = tab.getAttribute('data-filter');
-                const indicator = tab.querySelector('.filter-indicator');
-                tab.textContent = filterType.charAt(0).toUpperCase() + filterType.slice(1);
-                if (indicator) tab.appendChild(indicator);
-                
-                // Disable dependent dropdowns
-                if (filterType !== 'scheme') {
-                    tab.disabled = true;
-                }
-            });
-            
-            // Reset dropdown selections
-            document.querySelectorAll('.dropdown li').forEach(li => {
-                li.classList.remove('selected');
-                if (li.getAttribute('data-value') === 'All') {
-                    li.classList.add('selected');
-                }
-            });
-            
-            // Reset dependent dropdowns
-            resetSubjectDropdown();
-            
-            // Repopulate from scratch
-            await populateSchemeDropdown();
-            
-            // Update UI
-            storeFilterValuesInSession();
-            updateFilterIndicators();
-            renderDocuments();
-            
-            console.log("All filters cleared");
+// Initialize upload button handlers
+function initializeUploadButtons() {
+    const uploadBtn = document.getElementById('upload-btn');
+    if (uploadBtn) {
+        uploadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '../upload/uploadPage.html';
         });
+    }
+    
+    const uploadBtnMobile = document.getElementById('upload-btn-mobile');
+    if (uploadBtnMobile) {
+        uploadBtnMobile.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '../upload/uploadPage.html';
+        });
+    }
+}
+
+// Initialize logout handler
+function initializeLogoutHandler() {
+    const logoutButton = document.querySelector('.bg-red-500');
+    if (logoutButton) {
+        logoutButton.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const confirmLogout = confirm('Are you sure you want to logout?');
+            if (confirmLogout) {
+                await handleLogout();
+            }
+        });
+    }
+}
+
+// Handle logout
+async function handleLogout() {
+    try {
+        console.log('🔓 Initiating logout...');
+        
+        const response = await fetch('/api/user/logout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        
+        if (response.ok || response.status === 404) {
+            // Clear cookies manually if API call fails
+            document.cookie = 'is_logged_in=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'user_email=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            document.cookie = 'session_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            
+            console.log('✅ Logout successful');
+            window.location.href = '../login/loginPage.html';
+        } else {
+            throw new Error('Logout failed');
+        }
+    } catch (error) {
+        console.error('❌ Logout error:', error);
+        // Force logout anyway
+        document.cookie = 'is_logged_in=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        window.location.href = '../login/loginPage.html';
     }
 }
 
@@ -678,7 +482,7 @@ function initializeClearFilters() {
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('📄 Stucon Main Page initialized with API integration');
+    console.log('📄 Stucon Main Page initialized');
     
     // Check authentication first
     const isAuthenticated = await checkAuthenticationAndRedirect();
@@ -689,36 +493,25 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Update user display
     updateUserDisplay();
     
-    // Start session monitoring
-    startSessionMonitoring();
-    
-    // Initialize upload buttons
-    initializeUploadButtons();
-    
-    // ✅ NEW: Initialize API-driven dropdowns
-    await populateSchemeDropdown();
+    // Fetch documents
+    await fetchDocuments();
     
     // Initialize event handlers
     initializeDropdownHandlers();
-    initializeClearFilters();
+    initializeUploadButtons();
+    initializeLogoutHandler();
     
-    // Attach logout handler
-    const logoutButton = document.querySelector('.bg-red-500');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-            const confirmLogout = confirm('Are you sure you want to logout?');
-            if (confirmLogout) {
-                await handleLogout();
-            }
-        });
-        console.log('✅ Logout button handler attached');
+    // Initialize clear filters button
+    const clearBtn = document.getElementById('clearFilters');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', clearAllFilters);
     }
     
-    // Initial render
+    // Initial render with all documents
     renderDocuments();
+    updateFilterCount();
     
-    console.log('✅ Main page ready with API-driven filtering!');
+    console.log('✅ Main page ready!');
 });
 
-console.log("✅ Stucon Main Page - Ready with API integration!");
+console.log("✅ Stucon Main Page - Ready with working dropdowns!");
