@@ -9,7 +9,7 @@ function hasAuthCookie() {
     const cookies = document.cookie.split('; ');
     for (const cookie of cookies) {
         const [name, value] = cookie.split('=');
-        if (name === 'is_authenticated' && value === 'true') {
+        if (name === 'is_logged_in' && value === 'true') {
             return true;
         }
     }

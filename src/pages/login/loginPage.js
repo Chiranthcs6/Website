@@ -74,21 +74,22 @@ document.addEventListener('DOMContentLoaded', function() {
             // 📥 RECEIVE: Get response data from backend server
             // ============================================================
             const responseData = await apiResponse.json();
-            
+
             if (responseData.valid) {
-                // 🍪 STORE IN COOKIES: Save user session data
-                setCookie('session_token', responseData.session_token, 7); // 7 days
-                setCookie('user_email', email, 7); // 7 days
-                setCookie('is_logged_in', 'true', 7); // 7 days
-                
-                console.log('✅ Login successful, cookies set');
-                alert('Login successful! Welcome to Stucon.');
-                
-                // Redirect to main page
-                window.location.href = '/src/pages/main/mainPage.html';
+            //  STORE IN COOKIES: Save user session data
+                setCookie('session_token', responseData.session_token, 7);
+                setCookie('user_email', email, 7);
+                setCookie('is_logged_in', 'true', 7);
+
+            console.log('✅ Login successful, cookies set');
+            alert('Login successful! Welcome to Stucon.');
+
+            // Redirect to main page
+            window.location.href = '../main/mainPage.html';
             } else {
-                alert('Login failed: ' + (responseData.error || 'Invalid credentials'));
+            alert('❌ Login failed: ' + (responseData.error || 'Invalid credentials'));
             }
+
 
         } catch (error) {
             console.error('API Login error:', error);
