@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Login successful! Welcome to Stucon.');
 
             // Redirect to main page
-            window.location.href = '../main/mainPage.html';
+            window.location.href = '/src/pages/main/mainPage.html';
             } else {
             alert('❌ Login failed: ' + (responseData.error || 'Invalid credentials'));
             }
