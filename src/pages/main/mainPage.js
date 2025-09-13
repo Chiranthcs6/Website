@@ -24,7 +24,7 @@ async function validateSession() {
 
         const email = getCookie('user_email');
         const token = getCookie('session_token');
-        console.log(email, token);
+        console.log("Logging Email and Token:", email, token);
 
         if (!email || !token) {
             console.log('❌ Missing email or token in cookies');
