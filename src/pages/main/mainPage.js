@@ -116,7 +116,7 @@ async function handleLogout() {
                 Logging out...
             `;
             
-            const apiResponse = await fetch('/api/users/logout', {
+            const apiResponse = await fetch('/api/user/logout', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
@@ -179,7 +179,7 @@ function startSessionMonitoring() {
 function handleUploadRedirect() {
     console.log('📤 Redirecting to upload page...');
     storeFilterValuesInSession();
-    window.location.href = '../src/pages/upload/uploadPage.html';
+    window.location.href = '/src/pages/upload/uploadPage.html';
 }
 
 function initializeUploadButtons() {
