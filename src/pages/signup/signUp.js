@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         try {
             // 📤 REQUEST: Send signup data to backend
-            const apiResponse = await fetch('http://172.16.6.70:8080/api/user/signup', {
+            const apiResponse = await fetch('/api/user/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
