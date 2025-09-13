@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 
                 // Redirect to main page
-                window.location.href = '../src/pages/main/mainPage.html';
+                window.location.href = '/src/pages/main/mainPage.html';
             } else {
                 alert('Signup failed: ' + (responseData.error || 'Account creation failed'));
             }
