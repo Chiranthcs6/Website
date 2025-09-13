@@ -33,7 +33,7 @@ async function validateSession() {
         const response = await fetch('/api/auth/validate', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, token })
+            body: JSON.stringify({ "email":email, "token":token })
         });
 
         if (response.status === 200) {
