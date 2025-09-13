@@ -31,7 +31,7 @@ async function validateSession() {
             return false;
         }
 
-        const response = await fetch('/api/validate', {
+        const response = await fetch('/api/user/validate', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ "email":email, "token":token })
@@ -76,8 +76,8 @@ function updateUserDisplay() {
 // Redirect to login page
 function redirectToLogin(message = 'Please log in to access this page.') {
     console.log('🔒 Redirecting to login page:', message);
-    alert(message);
-    window.location.href = '../login/loginPage.html';
+    //alert(message);
+    //window.location.href = '../login/loginPage.html';
 }
 
 // Check authentication and redirect if necessary
