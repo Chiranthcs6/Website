@@ -53,9 +53,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check response structure: {valid: boolean, token: string}
             if (responseData.valid) {
                 // Store authentication data
-                document.cookie='session_token'= responseData.token;
-                document.cookie='isLoggedIn'= true;
-                document.cookie='userEmail'= email;
+            document.cookie = `session_token=${responseData.token}; path=/;`;
+            document.cookie = `isLoggedIn=${true}; path=/;`;
+            document.cookie = `userEmail=${email}; path=/;`;
+
                 
                 
                 
