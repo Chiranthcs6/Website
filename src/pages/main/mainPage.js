@@ -69,7 +69,7 @@ function updateUserDisplay() {
 function redirectToLogin(message = 'Please log in to access this page.') {
     console.log('🔒 Redirecting to login page:', message);
     alert(message);
-    window.location.href = '../src/pages/login/loginPage.html';
+    window.location.href = '../login/loginPage.html';
 }
 
 // Check authentication and redirect if necessary
@@ -119,7 +119,7 @@ async function handleLogout() {
             if (apiResponse.ok) {
                 console.log('✅ Logout successful');
                 alert('Logout successful! You will be redirected to the login page.');
-                window.location.href = '../src/pages/login/loginPage.html';
+                window.location.href = '../login/loginPage.html';
             } else {
                 const errorData = await apiResponse.json().catch(() => ({}));
                 const errorMessage = errorData.error || 'Logout failed';
