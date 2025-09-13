@@ -30,7 +30,7 @@ async function validateSession() {
             return false;
         }
 
-        const response = await fetch('/api/auth/validate', {
+        const response = await fetch('/api/validate', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ "email":email, "token":token })
