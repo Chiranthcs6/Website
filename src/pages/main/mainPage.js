@@ -4,42 +4,46 @@
 
 let currentUser = null;
 
-// Check if user has valid session using companion cookie
-function hasAuthCookie() {
-    const cookies = document.cookie.split('; ');
-    for (const cookie of cookies) {
-        const [name, value] = cookie.split('=');
-        if (name === 'is_logged_in' && value === 'true') {
-            return true;
-        }
-    }
-    return false;
+// Helper: read cookie
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+    return null;
 }
 
-// Validate session with backend
+// Check if user has valid session using companion cookie
+function hasAuthCookie() {
+    return getCookie('is_logged_in') === 'true';
+}
+
+// ✅ FIXED: Validate session with backend (status-based)
 async function validateSession() {
     try {
         console.log('🔍 Validating session with backend...');
-        
+
+        const email = getCookie('user_email');
+        const token = getCookie('session_token');
+
+        if (!email || !token) {
+            console.log('❌ Missing email or token in cookies');
+            return false;
+        }
+
         const response = await fetch('/api/auth/validate', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, token })
         });
 
-        if (response.ok) {
-            const data = await response.json();
-            if (data.valid) {
-                currentUser = data.user;
-                console.log('✅ Session valid:', currentUser);
-                return true;
-            }
+        if (response.status === 200) {
+            console.log('✅ Session valid');
+            currentUser = { email: email, username: email.split('@')[0] }; // simple fallback
+            return true;
+        } else {
+            console.log('❌ Session invalid or expired');
+            return false;
         }
-        
-        console.log('❌ Session invalid or expired');
-        return false;
     } catch (error) {
         console.error('❌ Session validation error:', error);
         return false;
@@ -49,21 +53,24 @@ async function validateSession() {
 // Update user display
 function updateUserDisplay() {
     if (!currentUser) return;
-    
+
     const usernameElement = document.getElementById('username-display');
     const userAvatarElement = document.getElementById('user-avatar');
-    
+
     if (usernameElement) {
-        usernameElement.textContent = currentUser.username;
+        usernameElement.textContent = currentUser.username || currentUser.email;
     }
-    
+
     if (userAvatarElement) {
-        const initials = currentUser.username.substring(0, 2).toUpperCase();
+        const initials = (currentUser.username || currentUser.email)
+            .substring(0, 2)
+            .toUpperCase();
         userAvatarElement.textContent = initials;
     }
-    
+
     console.log(`✅ User display updated: ${currentUser.username} (${currentUser.email})`);
 }
+
 
 // Redirect to login page
 function redirectToLogin(message = 'Please log in to access this page.') {
