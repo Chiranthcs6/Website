@@ -37,9 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: email,
-                    name: username,
-                    password: password  // ✅ Plain password (no hashing)
+                    "email": email,
+                    "name": username,
+                    "password": password  // ✅ Plain password (no hashing)
                 })
             });
 
