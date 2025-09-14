@@ -1,14 +1,15 @@
 // =============================================================================
-// FRONTEND SESSION MANAGEMENT - NO AUTO-REDIRECTS
+// STUCON FRONTEND SESSION MANAGEMENT 
 // =============================================================================
 
 /**
- * Set cookie with proper formatting
+ * Set cookie with proper formatting and path
  */
-function setCookie(name, value, days = 7) {
-    const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+function setCookie(name, value, hours = 24) {
+    const expires = new Date(Date.now() + hours * 60 * 60 * 1000).toUTCString();
+    // Set with path=/ for consistency across all pages
     document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/`;
-    console.log(`🍪 Cookie set: ${name}=${value}`);
+    console.log(`🍪 Cookie set: ${name}=${value} (expires in ${hours}h)`);
 }
 
 /**
@@ -27,49 +28,108 @@ function getCookie(name) {
 }
 
 /**
- * Delete cookie
+ * Delete cookie with proper path clearing
  */
 function deleteCookie(name) {
+    // Delete with multiple path variations to ensure complete removal
     document.cookie = `${name}=; max-age=0; path=/`;
-    console.log(`🗑️ Cookie deleted: ${name}`);
+    document.cookie = `${name}=; max-age=0; path=/src`;
+    document.cookie = `${name}=; max-age=0; path=/src/pages`;
+    document.cookie = `${name}=; max-age=0`;
+    console.log(`🗑️ Cookie deleted: ${name} (all paths cleared)`);
 }
 
 /**
- * Clear all session cookies
+ * Generate random session token
  */
-function clearSessionCookies() {
-    deleteCookie('session_token');
-    deleteCookie('user_email');
-    deleteCookie('username');
-    deleteCookie('is_logged_in');
-    console.log('🧹 All session cookies cleared');
+function generateSessionToken() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let token = '';
+    for (let i = 0; i < 32; i++) {
+        token += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return 'stucon_' + token + '_' + Date.now();
 }
 
 /**
- * Manual redirect to login - ONLY WHEN USER CLICKS SOMETHING
+ * Check if user has valid stucon session
+ */
+function isUserLoggedIn() {
+    const sessionToken = getCookie('stucon_session');
+    const userEmail = getCookie('stucon_userEmail');
+    
+    console.log('🔍 Session check:', {
+        sessionToken: sessionToken ? '✅ Present' : '❌ Missing',
+        userEmail: userEmail ? '✅ Present' : '❌ Missing'
+    });
+    
+    return sessionToken && userEmail;
+}
+
+/**
+ * Get logged-in user info
+ */
+function getLoggedInUser() {
+    if (!isUserLoggedIn()) {
+        return null;
+    }
+    
+    const email = getCookie('stucon_userEmail');
+    const username = email.split('@')[0]; // Extract name before @
+    
+    return {
+        email: email,
+        username: username
+    };
+}
+
+/**
+ * Store login session (called after successful login)
+ */
+function storeLoginSession(email) {
+    const sessionToken = generateSessionToken();
+    
+    // Store both cookies for 24 hours
+    setCookie('stucon_session', sessionToken, 24);
+    setCookie('stucon_userEmail', email, 24);
+    
+    console.log('✅ Login session stored for:', email);
+    return sessionToken;
+}
+
+/**
+ * Clear login session (logout)
+ */
+function clearLoginSession() {
+    deleteCookie('stucon_session');
+    deleteCookie('stucon_userEmail');
+    console.log('🧹 Login session cleared');
+}
+
+/**
+ * Redirect to login page
  */
 function redirectToLogin(message = 'Please log in to access this page.') {
-    console.log('🔒 Manual redirect to login:', message);
-    clearSessionCookies();
+    console.log('🔒 Redirecting to login page:', message);
     alert(message);
     window.location.href = '/src/pages/login/loginPage.html';
 }
 
 /**
- * Get user from cookies - NO VALIDATION, NO REDIRECTS
+ * Validate page access (call at start of protected pages)
  */
-function getUserFromCookies() {
-    const email = getCookie('user_email');
-    const username = getCookie('username');
+function validatePageAccess() {
+    console.log('🛡️ Validating page access...');
     
-    if (email) {
-        return {
-            email: email,
-            username: username || email.split('@')[0]
-        };
+    if (!isUserLoggedIn()) {
+        console.log('❌ Access denied - user not logged in');
+        redirectToLogin('You must be logged in to access this page.');
+        return false;
     }
     
-    return null;
+    const user = getLoggedInUser();
+    console.log('✅ Access granted for:', user.username);
+    return user;
 }
 
-console.log('✅ Cookie helpers loaded - No automatic authentication checks');
+console.log('✅ Stucon cookie helpers loaded - Session management ready');

@@ -1,13 +1,13 @@
 // =============================================================================
-// LOGIN PAGE - COMPLETE FRONTEND SOLUTION
+// LOGIN PAGE - STUCON SESSION MANAGEMENT
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🔐 Stucon Login page loaded');
     
-    // Check if already logged in using simple cookie check
-    if (hasAuthCookies()) {
-        console.log('✅ Already logged in, redirecting...');
+    // Check if already logged in using stucon session
+    if (isUserLoggedIn()) {
+        console.log('✅ User already logged in, redirecting to main page...');
         window.location.href = '/src/pages/main/mainPage.html';
         return;
     }
@@ -41,6 +41,11 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        if (!email.includes('@') || !email.includes('.')) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+
         // Show loading state
         loginBtn.disabled = true;
         loginBtn.innerHTML = `
@@ -69,24 +74,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('📥 Backend response:', responseData);
                 
                 if (responseData.valid && responseData.token) {
-                    // Backend login successful
-                    console.log('🍪 Setting cookies from backend response...');
-                    
-                    setCookie('session_token', responseData.token, 7);
-                    setCookie('user_email', email, 7);
-                    setCookie('username', responseData.userId || email.split('@')[0], 7);
-                    setCookie('is_logged_in', 'true', 7);
-                    
-                    // Debug: Verify cookies were set
-                    console.log('🍪 Cookies verification:');
-                    console.log('  session_token:', getCookie('session_token'));
-                    console.log('  user_email:', getCookie('user_email'));
-                    console.log('  username:', getCookie('username'));
-                    console.log('  is_logged_in:', getCookie('is_logged_in'));
+                    // Backend login successful - store stucon session
+                    console.log('🍪 Storing backend session...');
+                    storeLoginSession(email);
                     
                     console.log('✅ Backend login successful');
                     
-                    // Wait a bit to ensure cookies are set
+                    // Wait to ensure cookies are set
                     setTimeout(() => {
                         alert('Login successful! Welcome to Stucon.');
                         window.location.href = '/src/pages/main/mainPage.html';
@@ -101,28 +95,16 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('⚠️ Backend unavailable, using frontend-only login:', error.message);
             
             // Frontend-only fallback (for demo purposes)
-            const username = email.split('@')[0];
+            console.log('🍪 Storing frontend session...');
             
-            console.log('🍪 Setting fallback cookies...');
-            
-            // Set session cookies with longer expiry for testing
-            setCookie('session_token', 'frontend_' + Date.now(), 7);
-            setCookie('user_email', email, 7);
-            setCookie('username', username, 7);
-            setCookie('is_logged_in', 'true', 7);
-            
-            // Debug: Verify fallback cookies
-            console.log('🍪 Fallback cookies verification:');
-            console.log('  session_token:', getCookie('session_token'));
-            console.log('  user_email:', getCookie('user_email'));
-            console.log('  username:', getCookie('username'));
-            console.log('  is_logged_in:', getCookie('is_logged_in'));
+            // Store stucon session cookies
+            storeLoginSession(email);
             
             console.log('✅ Frontend-only login successful');
             
             // Wait to ensure cookies are set
             setTimeout(() => {
-                alert('Login successful! (Demo Mode - Backend Unavailable)');
+                alert('Login successful! Welcome to Stucon.\n(Demo Mode - Backend Unavailable)');
                 window.location.href = '/src/pages/main/mainPage.html';
             }, 300);
             
@@ -151,5 +133,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    console.log('✅ Login form initialized with backend fallback');
+    console.log('✅ Login form initialized with stucon session management');
 });

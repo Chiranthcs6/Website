@@ -1,5 +1,5 @@
 // =============================================================================
-// MAIN PAGE - NO AUTHENTICATION CHECKS ON LOAD
+// MAIN PAGE - STUCON PROTECTED PAGE
 // =============================================================================
 
 let currentUser = null;
@@ -14,33 +14,24 @@ const filters = {
 };
 
 // =============================================================================
-// SESSION MANAGEMENT - NO AUTO CHECKS
+// STRICT ACCESS CONTROL - RUNS IMMEDIATELY
+// =============================================================================
+
+// Validate access BEFORE any other code runs
+currentUser = validatePageAccess();
+if (!currentUser) {
+    // validatePageAccess handles redirect, just stop execution
+    throw new Error('Access denied - redirecting to login');
+}
+
+console.log('✅ MainPage access granted for:', currentUser.username);
+
+// =============================================================================
+// USER INTERFACE UPDATES
 // =============================================================================
 
 /**
- * Try to get user from cookies - NO REDIRECTS
- */
-function tryGetCurrentUser() {
-    console.log('🔍 Trying to get current user from cookies...');
-    
-    currentUser = getUserFromCookies();
-    
-    if (currentUser) {
-        console.log('✅ User found in cookies:', currentUser.username);
-        return true;
-    } else {
-        console.log('⚠️ No user found in cookies - but continuing anyway');
-        // Create a default user so the page doesn't break
-        currentUser = {
-            email: 'demo@example.com',
-            username: 'Demo User'
-        };
-        return false;
-    }
-}
-
-/**
- * Update user display in navbar
+ * Update user display in navbar with Hello, <name>
  */
 function updateUserDisplay() {
     if (!currentUser) {
@@ -52,15 +43,13 @@ function updateUserDisplay() {
     const userAvatarElement = document.getElementById('user-avatar');
 
     if (usernameElement) {
-        const displayName = currentUser.username || currentUser.email.split('@')[0];
-        usernameElement.textContent = displayName;
-        console.log('✅ Username updated:', displayName);
+        // Display as "Hello, <name>" where name is everything before @
+        usernameElement.textContent = currentUser.username;
+        console.log('✅ Username updated:', currentUser.username);
     }
 
     if (userAvatarElement) {
-        const initials = (currentUser.username || currentUser.email)
-            .substring(0, 2)
-            .toUpperCase();
+        const initials = currentUser.username.substring(0, 2).toUpperCase();
         userAvatarElement.textContent = initials;
         console.log('✅ User avatar updated:', initials);
     }
@@ -89,14 +78,33 @@ async function handleLogout() {
             Logging out...
         `;
         
-        // Always clear frontend session
-        clearSessionCookies();
+        // Try backend logout
+        try {
+            const response = await fetch('/api/user/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "email": getCookie('stucon_userEmail'),
+                    "token": getCookie('stucon_session')
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Backend logout successful');
+            }
+        } catch (error) {
+            console.log('⚠️ Backend logout failed, proceeding with frontend logout');
+        }
+        
+        // Always clear stucon session
+        clearLoginSession();
         alert('Logout successful! You will be redirected to the login page.');
         window.location.href = '/src/pages/login/loginPage.html';
         
     } catch (error) {
         console.error('❌ Logout error:', error);
-        clearSessionCookies();
+        clearLoginSession();
         window.location.href = '/src/pages/login/loginPage.html';
     }
 }
@@ -106,14 +114,8 @@ async function handleLogout() {
 // =============================================================================
 
 function handleUploadClick() {
-    // Check if user is logged in ONLY when they try to upload
-    if (!getUserFromCookies()) {
-        alert('Please log in to upload documents.');
-        window.location.href = '/src/pages/login/loginPage.html';
-        return;
-    }
-    
     console.log('📤 Redirecting to upload page');
+    // No need to check login again - already validated on page load
     window.location.href = '/src/pages/upload/uploadPage.html';
 }
 
@@ -332,15 +334,8 @@ function downloadDocument(docId) {
     const doc = allDocuments.find(d => d.id === docId);
     if (doc) {
         console.log('📥 Downloading document:', doc.title);
-        
-        // For now, redirect to title page (you can change this to actual download later)
+        // Redirect to title page for now
         window.location.href = `/src/pages/title/titlePage.html?id=${docId}`;
-        
-        // Or if you want to keep it as an alert for now:
-        // alert('Download feature would open: ' + doc.title);
-    } else {
-        console.error('❌ Document not found with ID:', docId);
-        alert('Document not found!');
     }
 }
 
@@ -551,29 +546,28 @@ function clearAllFilters() {
 }
 
 // =============================================================================
-// PAGE INITIALIZATION - NO AUTHENTICATION CHECKS
+// PAGE INITIALIZATION - AFTER ACCESS VALIDATION
 // =============================================================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📄 Stucon Main Page initializing - NO AUTH CHECKS...');
+    console.log('📄 Stucon Main Page initializing (user authenticated)...');
     
-    // 1. Just try to get user from cookies - NO REDIRECTS
-    tryGetCurrentUser();
+    // User is already validated at top of file, so we can proceed
     
-    // 2. Update user display (will show demo user if no login)
+    // 1. Update user display
     updateUserDisplay();
     
-    // 3. Initialize event handlers immediately
+    // 2. Initialize event handlers immediately
     initializeDropdownHandlers();
     
-    // 4. Initialize upload buttons
+    // 3. Initialize upload buttons
     const uploadBtn = document.getElementById('upload-btn');
     const uploadBtnMobile = document.getElementById('upload-btn-mobile');
     
     if (uploadBtn) {
         uploadBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            handleUploadClick(); // This will check login when clicked
+            handleUploadClick();
         });
         console.log('✅ Desktop upload button initialized');
     }
@@ -581,12 +575,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (uploadBtnMobile) {
         uploadBtnMobile.addEventListener('click', (e) => {
             e.preventDefault();
-            handleUploadClick(); // This will check login when clicked
+            handleUploadClick();
         });
         console.log('✅ Mobile upload button initialized');
     }
     
-    // 5. Initialize logout handler
+    // 4. Initialize logout handler
     const logoutButton = document.querySelector('.bg-red-500');
     if (logoutButton) {
         logoutButton.addEventListener('click', async (e) => {
@@ -599,14 +593,14 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Logout button initialized');
     }
     
-    // 6. Initialize clear filters button
+    // 5. Initialize clear filters button
     const clearBtn = document.getElementById('clearFilters');
     if (clearBtn) {
         clearBtn.addEventListener('click', clearAllFilters);
         console.log('✅ Clear filters button initialized');
     }
     
-    // 7. Fetch documents and populate UI
+    // 6. Fetch documents and populate UI
     fetchDocuments().then(() => {
         populateDropdowns().then(() => {
             renderDocuments();
@@ -617,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('❌ Error during document loading:', error);
     });
     
-    console.log('✅ Main page initialization complete - NO AUTH REQUIRED!');
+    console.log('✅ Main page initialization complete - Stucon session active!');
 });
 
-console.log("✅ Stucon Main Page Script Loaded - NO AUTHENTICATION CHECKS ON LOAD!");
+console.log("✅ Stucon Main Page Script Loaded - PROTECTED WITH SESSION VALIDATION!");

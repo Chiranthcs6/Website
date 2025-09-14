@@ -1,31 +1,22 @@
 // =============================================================================
-// UPLOAD PAGE - COMPLETE FRONTEND SOLUTION
+// UPLOAD PAGE - STUCON PROTECTED PAGE
 // =============================================================================
 
 let currentUser = null;
+
+// Validate access BEFORE any other code runs
+currentUser = validatePageAccess();
+if (!currentUser) {
+    throw new Error('Access denied - redirecting to login');
+}
+
+console.log('✅ UploadPage access granted for:', currentUser.username);
 
 // Check authentication and initialize page
 document.addEventListener('DOMContentLoaded', function() {
     console.log('📤 Upload page initializing...');
     
-    // Check if user is logged in using simple cookie check
-    if (!hasAuthCookies()) {
-        redirectToLogin('You must be logged in to access this page.');
-        return;
-    }
-    
-    // Create user object from cookies
-    const email = getCookie('user_email');
-    const username = getCookie('username') || email.split('@')[0];
-    
-    currentUser = {
-        email: email,
-        username: username
-    };
-    
-    console.log('✅ Authentication successful for:', currentUser.username);
-    
-    // Update user display
+    // User is already validated, so proceed
     updateUserDisplay();
     
     // Initialize form handler
@@ -47,53 +38,90 @@ document.addEventListener('DOMContentLoaded', function() {
  * Update user display
  */
 function updateUserDisplay() {
-    if (!currentUser) {
-        console.warn('⚠️ No currentUser available for display update');
-        return;
-    }
+    if (!currentUser) return;
     
     const usernameElement = document.getElementById('username-display');
     const userAvatarElement = document.getElementById('user-avatar');
 
     if (usernameElement) {
-        const displayName = currentUser.username || currentUser.email.split('@')[0];
-        usernameElement.textContent = displayName;
-        console.log('✅ Username updated:', displayName);
-    } else {
-        console.warn('⚠️ Username display element not found');
+        usernameElement.textContent = currentUser.username;
+        console.log('✅ Username updated:', currentUser.username);
     }
 
     if (userAvatarElement) {
-        const initials = (currentUser.username || currentUser.email)
-            .substring(0, 2)
-            .toUpperCase();
+        const initials = currentUser.username.substring(0, 2).toUpperCase();
         userAvatarElement.textContent = initials;
         console.log('✅ User avatar updated:', initials);
-    } else {
-        console.warn('⚠️ User avatar element not found');
     }
 }
 
 /**
- * Initialize logout handler
+ * Initialize logout handler - UPDATED TO MATCH MAINPAGE
  */
 function initializeLogoutHandler() {
-    // Find logout button by class instead of onclick attribute
     const logoutButton = document.querySelector('.bg-red-500');
     if (logoutButton) {
         logoutButton.addEventListener('click', async (e) => {
             e.preventDefault();
             const confirmLogout = confirm('Are you sure you want to logout?');
             if (confirmLogout) {
-                console.log('🔓 Logging out from upload page...');
-                clearSessionCookies();
-                alert('Logged out successfully!');
-                window.location.href = '/src/pages/login/loginPage.html';
+                await handleLogout(); // Use the robust logout function
             }
         });
         console.log('✅ Logout button initialized');
-    } else {
-        console.warn('⚠️ Logout button not found');
+    }
+}
+
+/**
+ * Handle logout process - SAME AS MAINPAGE
+ */
+async function handleLogout() {
+    try {
+        console.log('🔓 Initiating logout from upload page...');
+        
+        const logoutBtn = document.querySelector('.bg-red-500');
+        if (!logoutBtn) return;
+        
+        const originalText = logoutBtn.innerHTML;
+        
+        // Show loading state
+        logoutBtn.disabled = true;
+        logoutBtn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Logging out...
+        `;
+        
+        // Try backend logout
+        try {
+            const response = await fetch('/api/user/logout', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "email": getCookie('stucon_userEmail'),
+                    "token": getCookie('stucon_session')
+                })
+            });
+            
+            if (response.ok) {
+                console.log('✅ Backend logout successful');
+            }
+        } catch (error) {
+            console.log('⚠️ Backend logout failed, proceeding with frontend logout');
+        }
+        
+        // Always clear stucon session
+        clearLoginSession();
+        alert('Logout successful! You will be redirected to the login page.');
+        window.location.href = '/src/pages/login/loginPage.html';
+        
+    } catch (error) {
+        console.error('❌ Logout error:', error);
+        clearLoginSession();
+        window.location.href = '/src/pages/login/loginPage.html';
     }
 }
 
@@ -133,7 +161,7 @@ async function handleUpload(event) {
         uploadButton.innerHTML = `
             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 718-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
             Uploading...
         `;
@@ -181,10 +209,9 @@ async function handleUpload(event) {
             goBack();
         }, 2000);
         
-        return; // Don't execute finally block immediately
+        return;
         
     } finally {
-        // This will only run for backend success case
         setTimeout(() => {
             if (uploadButton && originalText) {
                 uploadButton.disabled = false;
@@ -202,17 +229,4 @@ function goBack() {
     window.location.href = '/src/pages/main/mainPage.html';
 }
 
-/**
- * Handle logout - Global function for HTML onclick
- */
-function handleLogout() {
-    const confirmLogout = confirm('Are you sure you want to logout?');
-    if (confirmLogout) {
-        console.log('🔓 Logging out...');
-        clearSessionCookies();
-        alert('Logged out successfully!');
-        window.location.href = '/src/pages/login/loginPage.html';
-    }
-}
-
-console.log('✅ Upload page script loaded - Complete frontend solution');
+console.log('✅ Upload page script loaded - PROTECTED WITH SESSION VALIDATION!');
