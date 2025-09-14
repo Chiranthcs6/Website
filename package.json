@@ -1,16 +1,35 @@
 {
-  "name": "web",
+  "name": "stucon",
   "version": "1.0.0",
-  "description": "",
+  "description": "Student Document Management System - A college resource sharing platform",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "install-deps": "npm install",
     "build-css": "tailwindcss -i ./src/input.css -o ./styles/style.css",
-    "watch-css": "tailwindcss -i ./src/input.css -o ./styles/style.css --watch"
+    "watch-css": "tailwindcss -i ./src/input.css -o ./styles/style.css --watch",
+    "dev": "npm run watch-css",
+    "setup": "npm install && npm run build-css",
+    "clean": "rm -rf node_modules && rm -f package-lock.json",
+    "reinstall": "npm run clean && npm install",
+    "start": "npm run build-css && echo 'CSS built! Open your HTML files in live server.'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "student",
+    "document",
+    "management",
+    "college",
+    "resource",
+    "sharing",
+    "tailwindcss",
+    "frontend"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/stucon.git"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.6",
@@ -18,5 +37,9 @@
   },
   "dependencies": {
     "argon2-browser": "^1.18.0"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
   }
 }
