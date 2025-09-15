@@ -248,6 +248,36 @@ function getFilteredDocuments() {
     console.log(`📋 Filtered ${filteredDocs.length} documents from ${allDocuments.length} total`);
     return filteredDocs;
 }
+//Render documents in the grid
+function renderDocuments(docs = []) {
+  const content = document.getElementById("content");
+  const noResults = document.getElementById("no-results");
+  const resultsTitle = document.getElementById("results-title");
+
+  content.innerHTML = "";
+
+  if (!docs.length) {
+    noResults.classList.remove("hidden");
+    resultsTitle.textContent = "No Documents Found";
+    return;
+  }
+
+  noResults.classList.add("hidden");
+
+  // Add cards
+  docs.forEach(doc => {
+    const card = document.createElement("div");
+    card.className = "card bg-white rounded-lg shadow p-4";
+    card.innerHTML = `
+      <h3 class="text-lg font-bold text-gray-800">${doc.title}</h3>
+      <p class="text-gray-600 text-sm">${doc.description || "No description available"}</p>
+    `;
+    content.appendChild(card);
+  });
+
+  // 🔥 Update header dynamically
+  resultsTitle.textContent = `Showing ${docs.length} Document${docs.length > 1 ? "s" : ""}`;
+}
 
 /**
  * Render documents in the grid
@@ -691,16 +721,20 @@ document.addEventListener("DOMContentLoaded", fetchSchemes);
         console.log('✅ Clear filters button initialized');
     }
     
-    // 6. Fetch documents and populate UI
-    fetchDocuments().then(() => {
-        populateDropdowns().then(() => {
-            renderDocuments();
-            updateFilterCount();
-            console.log('✅ Documents loaded and UI populated');
-        });
-    }).catch(error => {
-        console.error('❌ Error during document loading:', error);
-    });
+// 6. Fetch schemes and branches directly from backend
+Promise.all([fetchSchemes(), fetchBranches()])
+  .then(() => {
+    // Optionally load sample documents or real docs from backend
+    allDocuments = getSampleDocuments(); // Replace with real fetch later
+
+    renderDocuments();
+    updateFilterCount();
+    console.log('✅ Schemes & branches loaded, documents rendered');
+  })
+  .catch(error => {
+    console.error('❌ Error during initialization:', error);
+  });
+
     
     console.log('✅ Main page initialization complete - Stucon session active!');
 });
