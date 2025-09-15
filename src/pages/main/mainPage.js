@@ -639,7 +639,7 @@ async function fetchBranches() {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
     const data = await response.json();
-    console.log("✅ Branches fetched:", data.strArr);
+    console.log("✅ Branches fetched:", data.branchArr);
 
     const dropdown = document.getElementById('branch-dropdown');
 
