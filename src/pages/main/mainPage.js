@@ -62,12 +62,12 @@ function updateUserDisplay() {
 async function handleLogout() {
     try {
         console.log('🔓 Initiating logout...');
-        
+
         const logoutBtn = document.querySelector('.bg-red-500');
         if (!logoutBtn) return;
-        
+
         const originalText = logoutBtn.innerHTML;
-        
+
         // Show loading state
         logoutBtn.disabled = true;
         logoutBtn.innerHTML = `
@@ -77,37 +77,41 @@ async function handleLogout() {
             </svg>
             Logging out...
         `;
-        
+
         // Try backend logout
         try {
             const response = await fetch('/api/user/logout', {
-                method: 'POST',
+                method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    "email": getCookie('stucon_userEmail'),
-                    "token": getCookie('stucon_session')
+                    email: getCookie('stucon_userEmail'),
+                    token: getCookie('stucon_session')
                 })
             });
-            
-            if (response.ok) {
+
+            if (response.status === 200) {
                 console.log('✅ Backend logout successful');
+            } else {
+                console.error('⚠️ Logout failed with status:', response.status);
+                throw new Error('Session error: invalid or expired token');
             }
         } catch (error) {
             console.log('⚠️ Backend logout failed, proceeding with frontend logout');
         }
-        
+
         // Always clear stucon session
         clearLoginSession();
         alert('Logout successful! You will be redirected to the login page.');
         window.location.href = '/src/pages/login/loginPage.html';
-        
+
     } catch (error) {
         console.error('❌ Logout error:', error);
         clearLoginSession();
         window.location.href = '/src/pages/login/loginPage.html';
     }
 }
+
 
 // =============================================================================
 // UPLOAD FUNCTIONALITY
