@@ -127,28 +127,6 @@ function handleUploadClick() {
 // DOCUMENT MANAGEMENT
 // =============================================================================
 
-async function fetchDocuments() {
-    try {
-        console.log('📋 Fetching documents from backend...');
-        
-        const response = await fetch('/api/documents/all', {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            allDocuments = data["documents"] || data || [];
-            console.log('✅ Documents fetched from backend:', allDocuments.length);
-        } else {
-            throw new Error('Backend fetch failed');
-        }
-    } catch (error) {
-        console.log('⚠️ Backend unavailable, using sample documents');
-        allDocuments = getSampleDocuments();
-    }
-}
 
 function getSampleDocuments() {
     return [
