@@ -563,12 +563,120 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('✅ Mobile upload button initialized');
     }
     
+
+// API call to fetch Dropdown - schemes
+async function fetchSchemes() {
+  try {
+    const response = await fetch('/api/explore/getscheme', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    console.log("✅ Schemes fetched:", data.strArr);
+
+    const dropdown = document.getElementById('scheme-dropdown');
+
+    // Remove old <li> except "All Schemes"
+    dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
+
+    // Insert new schemes
+    data.strArr.forEach(scheme => {
+      const li = document.createElement('li');
+      li.setAttribute('data-value', scheme);  // string itself as value
+      li.textContent = scheme;                // show directly
+      dropdown.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("❌ Error fetching schemes:", error);
+  }
+}
+
+
+// API call to fetch Dropdown - branches
+async function fetchBranches() {
+  try {
+    const response = await fetch('/api/explore/getbranch', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    });
+
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+    const data = await response.json();
+    console.log("✅ Branches fetched:", data.strArr);
+
+    const dropdown = document.getElementById('branch-dropdown');
+
+    // Remove old <li> except "All Branches"
+    dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
+
+    // Insert new branches
+    data.strArr.forEach(branch => {
+      const li = document.createElement('li');
+      li.setAttribute('data-value', branch);
+      li.textContent = branch;
+      dropdown.appendChild(li);
+    });
+
+  } catch (error) {
+    console.error("❌ Error fetching branches:", error);
+  }
+}
+
+
+
+//API for subjects
+async function fetchSubjects(branchId, semester) {
+    try {
+        const response = await fetch(`/api/explore/getsub?branch_id=${branchId}&semester=${semester}`, {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("✅ Subjects fetched:", data.subjectArr);
+
+        const dropdown = document.getElementById('subject-dropdown');
+
+        // Remove old <li> except "All Subjects"
+        dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
+
+        // Insert new subjects
+        data.subjectArr.forEach(subject => {
+        const li = document.createElement('li');
+        li.setAttribute('data-value', subject.subjectID);  // ID goes in data-value
+        li.textContent = subject.subjectName;              // Display the name
+        dropdown.appendChild(li);
+    });
+
+    } catch (error) {
+        console.error("❌ Error fetching subjects:", error);
+    }
+}
+
+
+//
+
+// Call this after DOM loads
+document.addEventListener("DOMContentLoaded", fetchSchemes);
+
     // 4. Initialize logout handler
     const logoutButton = document.querySelector('.bg-red-500');
     if (logoutButton) {
         logoutButton.addEventListener('click', async (e) => {
             e.preventDefault();
-            const confirmLogout = confirm('Are you sure you want to logout?');
+            //]const confirmLogout = confirm('Are you sure you want to logout?');
             if (confirmLogout) {
                 await handleLogout();
             }
