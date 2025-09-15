@@ -80,6 +80,7 @@ async function handleLogout() {
 
         // Try backend logout
         try {
+            console.log('req sent logout');
             const response = await fetch('/api/user/logout', {
                 method: 'PUT',
                 credentials: 'include',
