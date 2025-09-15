@@ -111,7 +111,7 @@ function clearLoginSession() {
  */
 function redirectToLogin(message = 'Please log in to access this page.') {
     console.log('🔒 Redirecting to login page:', message);
-    alert(message);
+    //alert(message);
     window.location.href = '/src/pages/login/loginPage.html';
 }
 

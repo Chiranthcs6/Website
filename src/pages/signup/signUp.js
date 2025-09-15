@@ -32,12 +32,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Basic validation
         if (!email || !password) {
-            alert('Please fill out all fields.');
+            //alert('Please fill out all fields.');
             return;
         }
 
         if (password.length < 6) {
-            alert('Password must be at least 6 characters long.');
+            //alert('Password must be at least 6 characters long.');
             return;
         }
 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('✅ Backend signup successful');
                     
                     setTimeout(() => {
-                        alert('Account created successfully! Welcome to Stucon.');
+                        //alert('Account created successfully! Welcome to Stucon.');
                         window.location.href = '/src/pages/main/mainPage.html';
                     }, 100);
                     return;
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('✅ Frontend-only signup successful');
             
             setTimeout(() => {
-                alert('Account created successfully! (Demo Mode - Backend Unavailable)');
+                //alert('Account created successfully! (Demo Mode - Backend Unavailable)');
                 window.location.href = '/src/pages/main/mainPage.html';
             }, 100);
 

@@ -32,17 +32,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Basic validation
         if (!email || !password) {
-            alert('Please fill out all fields.');
+            //alert('Please fill out all fields.');
             return;
         }
 
         if (password.length < 6) {
-            alert('Password must be at least 6 characters long.');
+            //alert('Password must be at least 6 characters long.');
             return;
         }
 
         if (!email.includes('@') || !email.includes('.')) {
-            alert('Please enter a valid email address.');
+            //alert('Please enter a valid email address.');
             return;
         }
 
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Wait to ensure cookies are set
                     setTimeout(() => {
-                        alert('Login successful! Welcome to Stucon.');
+                        //alert('Login successful! Welcome to Stucon.');
                         window.location.href = '/src/pages/main/mainPage.html';
                     }, 300);
                     return;
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Wait to ensure cookies are set
             setTimeout(() => {
-                alert('Login successful! Welcome to Stucon.\n(Demo Mode - Backend Unavailable)');
+                //alert('Login successful! Welcome to Stucon.\n(Demo Mode - Backend Unavailable)');
                 window.location.href = '/src/pages/main/mainPage.html';
             }, 300);
             

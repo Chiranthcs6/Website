@@ -115,7 +115,7 @@ async function handleLogout() {
         
         // Always clear stucon session
         clearLoginSession();
-        alert('Logout successful! You will be redirected to the login page.');
+        //alert('Logout successful! You will be redirected to the login page.');
         window.location.href = '/src/pages/login/loginPage.html';
         
     } catch (error) {
@@ -140,12 +140,12 @@ async function handleUpload(event) {
     
     // Validation
     if (!fileInput || !fileInput.files[0]) {
-        alert('Please select a file to upload.');
+        //alert('Please select a file to upload.');
         return;
     }
     
     if (!scheme || !branch || !semester || !subject) {
-        alert('Please fill out all fields.');
+        //alert('Please fill out all fields.');
         return;
     }
     
@@ -186,7 +186,7 @@ async function handleUpload(event) {
         
         if (response.ok) {
             console.log('✅ Backend upload successful');
-            alert('Document uploaded successfully!');
+            //alert('Document uploaded successfully!');
             goBack();
             return;
         } else {
@@ -205,7 +205,7 @@ async function handleUpload(event) {
                 uploadButton.innerHTML = originalText;
             }
             
-            alert(`Document "${file.name}" uploaded successfully!\n\nFile Details:\n- Size: ${(file.size / 1024).toFixed(1)} KB\n- Scheme: ${scheme}\n- Branch: ${branch}\n- Semester: ${semester}\n- Subject: ${subject}\n\n(Demo Mode - Backend Unavailable)`);
+            //alert(`Document "${file.name}" uploaded successfully!\n\nFile Details:\n- Size: ${(file.size / 1024).toFixed(1)} KB\n- Scheme: ${scheme}\n- Branch: ${branch}\n- Semester: ${semester}\n- Subject: ${subject}\n\n(Demo Mode - Backend Unavailable)`);
             goBack();
         }, 2000);
         
