@@ -60,58 +60,43 @@ function updateUserDisplay() {
 // =============================================================================
 
 async function handleLogout() {
+  try {
+    console.log('🔓 Initiating logout...');
+
+    // 1. Backend logout attempt
     try {
-        console.log('🔓 Initiating logout...');
+      console.log('📡 Sending logout request to backend...');
+      const response = await fetch('/api/user/logout', {
+        method: 'PUT',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: getCookie('stucon_userEmail'),
+          token: getCookie('stucon_session')
+        })
+      });
 
-        const logoutBtn = document.querySelector('.bg-red-500');
-        if (!logoutBtn) return;
-
-        const originalText = logoutBtn.innerHTML;
-
-        // Show loading state
-        //logoutBtn.disabled = true;
-        /*logoutBtn.innerHTML = `
-            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Logging out...
-        `;
-*/ 
-        // Try backend logout
-        try {
-            console.log('req sent logout');
-            const response = await fetch('/api/user/logout', {
-                method: 'PUT',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: getCookie('stucon_userEmail'),
-                    token: getCookie('stucon_session')
-                })
-            });
-
-            if (response.status === 200) {
-                console.log('✅ Backend logout successful');
-            } else {
-                console.error('⚠️ Logout failed with status:', response.status);
-                throw new Error('Session error: invalid or expired token');
-            }
-        } catch (error) {
-            console.log('⚠️ Backend logout failed, proceeding with frontend logout');
-        }
-
-        // Always clear stucon session
-        clearLoginSession();
-        //alert('Logout successful! You will be redirected to the login page.');
-        window.location.href = '/src/pages/login/loginPage.html';
-
-    } catch (error) {
-        console.error('❌ Logout error:', error);
-        clearLoginSession();
-        window.location.href = '/src/pages/login/loginPage.html';
+      if (response.ok) {
+        console.log('✅ Backend logout successful');
+      } else {
+        console.warn('⚠️ Backend logout failed with status:', response.status);
+      }
+    } catch (err) {
+      console.error('❌ Error during backend logout:', err);
     }
+
+    // 2. Clear frontend session always
+    clearLoginSession();
+
+    // 3. Redirect to login page
+    window.location.href = '/src/pages/login/loginPage.html';
+  } catch (error) {
+    console.error('❌ Logout error:', error);
+    clearLoginSession();
+    window.location.href = '/src/pages/login/loginPage.html';
+  }
 }
+
 
 
 // =============================================================================
@@ -596,75 +581,82 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // API call to fetch Dropdown - schemes
 async function fetchSchemes() {
-  try {
-    const response = await fetch('/api/explore/getscheme', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
-    });
+    try {
+        const response = await fetch('/api/explore/getscheme', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
 
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    const data = await response.json();
-    console.log("✅ Schemes fetched:", data.strArr);
+        const data = await response.json();
+        console.log("✅ Schemes fetched:", data.strArr);
 
-    const dropdown = document.getElementById('scheme-dropdown');
+        const dropdown = document.getElementById('scheme-dropdown');
 
-    // Remove old <li> except "All Schemes"
-    dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
+        // Remove old <li> except "All Schemes"
+        dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
 
-    // Insert new schemes
-    data.strArr.forEach(scheme => {
-      const li = document.createElement('li');
-      li.setAttribute('data-value', scheme);  // string itself as value
-      li.textContent = scheme;                // show directly
-      dropdown.appendChild(li);
-    });
+        // Insert new schemes
+        data.strArr.forEach(scheme => {
+            const li = document.createElement('li');
+            li.setAttribute('data-value', scheme);
+            li.textContent = scheme;
+            dropdown.appendChild(li);
+        });
 
-  } catch (error) {
-    console.error("❌ Error fetching schemes:", error);
-  }
+    } catch (error) {
+        console.error("❌ Error fetching schemes:", error);
+    }
 }
+
 
 
 // API call to fetch Dropdown - branches
+// API call to fetch Dropdown - branch 
 async function fetchBranches() {
-  try {
-    const response = await fetch('/api/explore/getbranch', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include'
-    });
+    try {
+        const response = await fetch('/api/explore/getbranch', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+        });
 
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-    const data = await response.json();
-    console.log("✅ Branches fetched:", data.branchArr);
+        const data = await response.json();
+        console.log("✅ Branches fetched:", data.branchArr);
 
-    const dropdown = document.getElementById('branch-dropdown');
+        const dropdown = document.getElementById('branch-dropdown');
 
-    // Remove old <li> except "All Branches"
-    dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
+        // Remove old <li> except "All Branches"
+        dropdown.querySelectorAll('li:not([data-value="All"])').forEach(li => li.remove());
 
-    // Insert new branches
-    data.strArr.forEach(branch => {
-      const li = document.createElement('li');
-      li.setAttribute('data-value', branch);
-      li.textContent = branch;
-      dropdown.appendChild(li);
-    });
+        // Insert new branches
+        data.branchArr.forEach(branch => {
+            const li = document.createElement('li');
+            li.setAttribute('data-value', branch.branchID);  // string ID
+            li.textContent = branch.branchName;              // visible name
+            dropdown.appendChild(li);
+        });
 
-  } catch (error) {
-    console.error("❌ Error fetching branches:", error);
-  }
+    } catch (error) {
+        console.error("❌ Error fetching branches:", error);
+    }
 }
+
 
 
 
 //API for subjects
-async function fetchSubjects(branchId, semester) {
+async function fetchSubjects(branchID, semester) {
     try {
-        const response = await fetch(`/api/explore/getsub?branch_id=${branchId}&semester=${semester}`, {
+        const response = await fetch(`/api/explore/getsub?branch_id=${branchID}&semester=${semester}`, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -684,11 +676,11 @@ async function fetchSubjects(branchId, semester) {
 
         // Insert new subjects
         data.subjectArr.forEach(subject => {
-        const li = document.createElement('li');
-        li.setAttribute('data-value', subject.subjectID);  // ID goes in data-value
-        li.textContent = subject.subjectName;              // Display the name
-        dropdown.appendChild(li);
-    });
+            const li = document.createElement('li');
+            li.setAttribute('data-value', subject.subjectID);
+            li.textContent = subject.subjectName;
+            dropdown.appendChild(li);
+        });
 
     } catch (error) {
         console.error("❌ Error fetching subjects:", error);
@@ -696,23 +688,26 @@ async function fetchSubjects(branchId, semester) {
 }
 
 
+
 //
 
 // Call this after DOM loads
 document.addEventListener("DOMContentLoaded", fetchSchemes);
 
-    // 4. Initialize logout handler
-    const logoutButton = document.querySelector('.bg-red-500');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', async (e) => {
-            e.preventDefault();
-            //]const confirmLogout = confirm('Are you sure you want to logout?');
-            if (confirmLogout) {
-                await handleLogout();
-            }
-        });
-        console.log('✅ Logout button initialized');
+// Logout button    
+const logoutButton = document.querySelector('.bg-red-500');
+if (logoutButton) {
+  logoutButton.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const ok = window.confirm('Are you sure you want to logout?');
+    if (ok) {
+      await handleLogout();
     }
+  });
+  console.log('✅ Logout button initialized');
+}
+
+
     
     // 5. Initialize clear filters button
     const clearBtn = document.getElementById('clearFilters');
